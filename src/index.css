@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  /* ─── Dark theme (default) ─────────────────────────────────────────────── */
+  :root {
+    --bg:        #0C0A1E;
+    --surface:   #16132D;
+    --nav-bg:    #0C0A1E;
+    --nav-border: rgba(255, 255, 255, 0.10);
+    --red:       #E8432D;
+    --yellow:    #F7C948;
+    --hole:      #060413;
+    --ink:       #111111;
+    --fg:        #EDE9FA;
+    --fg-muted:  rgba(237, 233, 250, 0.68);
+    --fg-faint:  rgba(237, 233, 250, 0.42);
+    --star:      rgba(255, 255, 255, 0.20);
+    --nav-inactive-bg:    rgba(255, 255, 255, 0.10);
+    --nav-inactive-hover: rgba(255, 255, 255, 0.20);
+    --nav-inactive-border: rgba(255, 255, 255, 0.22);
+  }
+
+  /* ─── Light theme ──────────────────────────────────────────────────────── */
+  [data-theme="light"] {
+    --bg:        #FAFAF7;
+    --surface:   #F0EDE4;
+    --nav-bg:    #FFFFFF;
+    --nav-border: rgba(0, 0, 0, 0.10);
+    --hole:      #D4CCE8;
+    --fg:        #1A1230;
+    --fg-muted:  rgba(26, 18, 48, 0.62);
+    --fg-faint:  rgba(26, 18, 48, 0.40);
+    --star:      rgba(0, 0, 0, 0.07);
+    --nav-inactive-bg:    rgba(0, 0, 0, 0.06);
+    --nav-inactive-hover: rgba(0, 0, 0, 0.12);
+    --nav-inactive-border: rgba(0, 0, 0, 0.15);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  #root { min-height: 100vh; }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Lilita One', cursive; }
+  .font-body    { font-family: 'Nunito', sans-serif; }
+
+  /* Semantic theme text colours */
+  .text-fg       { color: var(--fg); }
+  .text-fg-muted { color: var(--fg-muted); }
+  .text-fg-faint { color: var(--fg-faint); }
+  .bg-page       { background: var(--bg); }
+  .bg-surface    { background: var(--surface); }
+
+  /* Comic-book card — white on dark bg creates crisp contrast */
+  .card {
+    background: #FFFFFF;
+    border: 4px solid var(--ink);
+    border-radius: 1.5rem;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .btn-press {
+    transition: transform 80ms, box-shadow 80ms;
+  }
+  .btn-press:active {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0 var(--ink) !important;
+  }
+
+  /* Nav bar */
+  .nav-bar {
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
+    transition: background 0.25s ease;
+  }
+
+  /* Detail-level selector (facts page) */
+  .selector-track {
+    background: var(--nav-inactive-bg);
+    border: 1px solid var(--nav-border);
+  }
+  .selector-option {
+    color: var(--fg-muted);
+    transition: color 0.15s ease;
+  }
+  .selector-option:hover {
+    color: var(--fg);
+  }
+
+  /* Inactive nav links — theme-aware without JS */
+  .nav-inactive {
+    background: var(--nav-inactive-bg);
+    color: var(--fg);
+    border-color: var(--nav-inactive-border);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .nav-inactive:hover {
+    background: var(--nav-inactive-hover);
+  }
+}
