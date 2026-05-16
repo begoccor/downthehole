@@ -15,11 +15,13 @@ export default function App() {
         <div className="min-h-screen bg-page">
           <Nav />
           <TrophyToast />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/rabbit-holes" element={<RabbitHoles />} />
-          </Routes>
+          <div className="pb-16 md:pb-0">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/rabbit-holes" element={<RabbitHoles />} />
+            </Routes>
+          </div>
         </div>
       </BrowserRouter>
     </TrophyProvider>

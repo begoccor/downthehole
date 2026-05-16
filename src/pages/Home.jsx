@@ -3,13 +3,15 @@ import {
   motion, AnimatePresence,
   useMotionValue, useTransform,
 } from 'framer-motion';
-import { searchTopic, fetchRelated, fetchFullIntro, fetchArticleImages, extractFacts } from '../hooks/useWikipedia';
+import { searchTopic, fetchRelated, fetchFullIntro, fetchArticleImages, extractFacts, searchSuggestions } from '../hooks/useWikipedia';
+import SocialShare from '../components/SocialShare';
 import { useDownvotes } from '../hooks/useDownvotes';
 import { useHistory } from '../hooks/useHistory';
 import { useStreak, getDepthBadge } from '../hooks/useStreak';
 import { useTrophies } from '../contexts/TrophyContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getDailyTopic } from '../data/dailyTopics';
+import OArrow from '../components/OArrow';
 import PixelEarth from '../components/PixelEarth';
 import PixelRabbit from '../components/PixelRabbit';
 import PixelWorm from '../components/PixelWorm';
@@ -54,59 +56,60 @@ function getDepthStyle(depth) {
   return               { bg: '#FFFFFF', text: '#111111', border: 'rgba(0,0,0,0.25)'      };
 }
 
-// ─── O — tilted hole, tunnel rings vanishing into the void ───────────────────
-function OArrow() {
-  return (
-    <svg
-      viewBox="0 0 90 68"
-      style={{ display: 'inline-block', height: '0.75em', width: 'auto', verticalAlign: '0' }}
-      aria-hidden
-    >
-      {/*
-        Group rotated -8° so the whole O tilts slightly.
-        Inside: a solid dark fill (the void) + white semi-transparent rings
-        shrinking toward a vanishing point — visible in both dark and light mode
-        because white-on-black works regardless of page background.
-      */}
-      <g transform="rotate(-8 45 34)">
-        {/* The void — solid dark base so depth rings have contrast in dark mode */}
-        <ellipse cx="45" cy="34" rx="22" ry="14" fill="rgba(0,0,0,0.82)" />
-        {/* Depth rings — white, fading as they recede */}
-        <ellipse cx="45" cy="32" rx="17" ry="10.5" fill="none" stroke="rgba(255,255,255,0.24)" strokeWidth="1.5" />
-        <ellipse cx="45" cy="31" rx="12" ry="7.5"  fill="none" stroke="rgba(255,255,255,0.19)" strokeWidth="1.5" />
-        <ellipse cx="45" cy="30" rx="8"  ry="5"    fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1.5" />
-        <ellipse cx="45" cy="29" rx="5"  ry="3"    fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="1.5" />
-        {/* Pure void at the vanishing point */}
-        <ellipse cx="45" cy="28" rx="3"  ry="1.8"  fill="black" />
-        {/* Outer O ring */}
-        <ellipse cx="45" cy="34" rx="34" ry="22"
-          fill="none" stroke="currentColor" strokeWidth="12"
-        />
-      </g>
-    </svg>
-  );
-}
-
 // ─── Stars (input phase) ──────────────────────────────────────────────────────
+const STAR_DATA = [
+  { top: '6%',  left: '7%',  delay: 0,   dur: 7,  size: '2rem'   },
+  { top: '10%', left: '84%', delay: 1.2, dur: 9,  size: '2.5rem' },
+  { top: '22%', left: '3%',  delay: 2.8, dur: 6,  size: '1.2rem' },
+  { top: '38%', left: '93%', delay: 0.5, dur: 8,  size: '1rem'   },
+  { top: '55%', left: '5%',  delay: 3.1, dur: 7,  size: '2rem'   },
+  { top: '68%', left: '90%', delay: 1.7, dur: 10, size: '1.5rem' },
+  { top: '78%', left: '11%', delay: 2.3, dur: 6,  size: '1rem'   },
+  { top: '85%', left: '77%', delay: 0.9, dur: 8,  size: '0.8rem' },
+  { top: '92%', left: '44%', delay: 4,   dur: 7,  size: '1.2rem' },
+  { top: '48%', left: '96%', delay: 1.5, dur: 9,  size: '1.5rem' },
+  { top: '30%', left: '47%', delay: 5,   dur: 11, size: '0.7rem' },
+  { top: '72%', left: '51%', delay: 2.6, dur: 8,  size: '0.8rem' },
+];
+
 function Stars() {
-  const positions = [
-    { top: '8%',  left: '6%'  }, { top: '12%', left: '88%' },
-    { top: '72%', left: '5%'  }, { top: '78%', left: '91%' },
-    { top: '45%', left: '3%'  }, { top: '40%', left: '95%' },
-  ];
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-      {positions.map((p, i) => (
+      {STAR_DATA.map((s, i) => (
         <motion.span
           key={i}
-          className="absolute text-3xl select-none"
-          style={{ ...p, color: 'var(--star)' }}
-          animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.15, 0.9, 1] }}
-          transition={{ duration: 6 + i, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute select-none"
+          style={{ top: s.top, left: s.left, color: 'var(--star)', fontSize: s.size }}
+          animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.2, 0.85, 1], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: s.dur, repeat: Infinity, ease: 'easeInOut', delay: s.delay }}
         >
           ✦
         </motion.span>
       ))}
+    </div>
+  );
+}
+
+// ─── Earth with ambient glow ──────────────────────────────────────────────────
+function EarthWithGlow({ size = 200 }) {
+  return (
+    <div className="relative flex items-center justify-center">
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: size * 1.8,
+          height: size * 1.8,
+          background: 'radial-gradient(circle, rgba(232,67,45,0.22) 0%, rgba(247,201,72,0.10) 45%, transparent 70%)',
+          filter: 'blur(28px)',
+        }}
+      />
+      <motion.div
+        animate={{ y: [0, -14, 0] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.30))' }}
+      >
+        <PixelEarth size={size} />
+      </motion.div>
     </div>
   );
 }
@@ -188,10 +191,12 @@ function DimensionPhase({ onContinue }) {
 }
 
 // ─── Phase 1: Input ───────────────────────────────────────────────────────────
-function InputPhase({ onSearch, error, sharedTrail, likedTopics }) {
-  const { t } = useLanguage();
+const GRAIN_URL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E";
+
+function InputPhase({ onSearch, error, suggestions = [], sharedTrail, likedTopics }) {
+  const { lang, t } = useLanguage();
   const [value, setValue] = useState('');
-  const dailyTopic = getDailyTopic();
+  const dailyTopic = getDailyTopic(lang);
 
   const submit = (e) => {
     e.preventDefault();
@@ -204,15 +209,22 @@ function InputPhase({ onSearch, error, sharedTrail, likedTopics }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.2 } }}
-      className="relative flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-4 py-10"
+      className="relative flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-6 py-10"
     >
       <Stars />
+      {/* Film grain */}
+      <div className="fixed inset-0 pointer-events-none z-0"
+        style={{ backgroundImage: `url("${GRAIN_URL}")`, opacity: 0.04, backgroundSize: '200px 200px' }} />
+      {/* Warm centre glow — theme-aware via CSS var */}
+      <div className="fixed inset-0 pointer-events-none z-0"
+        style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 40%, var(--input-glow) 0%, transparent 100%)' }} />
 
+      {/* Shared trail banner — full width above columns */}
       {sharedTrail && (
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md mb-6 z-10 card shadow-[4px_4px_0_#111] p-4"
+          className="w-full max-w-4xl mx-auto mb-6 z-10 card shadow-[4px_4px_0_#111] p-4"
         >
           <p className="font-body text-xs text-black/50 uppercase tracking-widest mb-2">
             {t('shared_trail')}
@@ -234,80 +246,119 @@ function InputPhase({ onSearch, error, sharedTrail, likedTopics }) {
         </motion.div>
       )}
 
-      <motion.h1
-        initial={{ y: -24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }}
-        className="font-display text-[clamp(3rem,12vw,7rem)] text-fg text-center leading-none mb-2 z-10"
-      >
-        DOWN<br />THE H<OArrow />LE
-      </motion.h1>
-      <motion.p
-        initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}
-        className="font-body text-lg text-fg-muted mb-8 text-center z-10"
-      >
-        {t('tagline')}
-      </motion.p>
+      {/* Two-column layout */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-10 md:gap-20 max-w-4xl mx-auto w-full">
 
-      <motion.div
-        initial={{ scale: 0.7, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1, y: [0, -14, 0] }}
-        transition={{
-          scale: { delay: 0.2, duration: 0.5 }, opacity: { delay: 0.2, duration: 0.5 },
-          y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.7 },
-        }}
-        className="mb-8 z-10"
-        style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.22))' }}
-      >
-        <PixelEarth size={180} />
-      </motion.div>
-
-      <motion.form
-        onSubmit={submit}
-        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
-        className="w-full max-w-md z-10 space-y-3"
-      >
-        <input
-          type="text" value={value} onChange={e => setValue(e.target.value)}
-          placeholder={t('placeholder')} autoFocus
-          className="w-full px-5 py-4 text-lg font-body border-4 border-black rounded-2xl bg-white text-black shadow-[6px_6px_0_#111] focus:outline-none placeholder-black/30"
-        />
-        {error && <p className="text-center text-[#E8432D] font-body font-bold text-sm">{error}</p>}
-        <button
-          type="submit" disabled={!value.trim()}
-          className="w-full py-4 bg-[#E8432D] text-white font-display text-2xl border-4 border-black rounded-2xl shadow-[6px_6px_0_#111] btn-press disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {t('dive_btn')}
-        </button>
-        <div className="flex items-center justify-center gap-2 pt-1">
-          <span className="font-body text-sm text-fg-faint">{t('daily_label')}</span>
-          <button
-            type="button" onClick={() => onSearch(dailyTopic)}
-            className="font-body text-sm font-bold px-3 py-1.5 bg-[#F7C948] text-black border-2 border-black rounded-xl shadow-[2px_2px_0_#111] btn-press"
+        {/* LEFT: title, tagline, earth (mobile only), form */}
+        <div className="flex flex-col items-center md:items-start z-10 flex-1 min-w-0">
+          <motion.h1
+            initial={{ y: -24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }}
+            className="font-display text-[clamp(3rem,8vw,6rem)] text-fg text-center md:text-left leading-none mb-2"
           >
-            🔥 {dailyTopic}
-          </button>
-        </div>
-      </motion.form>
+            <span className="block">FOLLOW</span>
+            <span className="block whitespace-nowrap">THE H<OArrow />LE</span>
+          </motion.h1>
+          <motion.p
+            initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}
+            className="font-body text-lg text-fg-muted mb-7 text-center md:text-left"
+          >
+            {t('tagline')}
+          </motion.p>
 
-      {likedTopics?.size > 0 && (
+          {/* Earth — mobile only */}
+          <motion.div
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="md:hidden mb-8"
+          >
+            <EarthWithGlow size={160} />
+          </motion.div>
+
+          <motion.form
+            onSubmit={submit}
+            initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+            className="w-full max-w-md mx-auto md:mx-0 space-y-3"
+          >
+            <input
+              type="text" value={value} onChange={e => setValue(e.target.value)}
+              placeholder={t('placeholder')} autoFocus
+              aria-label={t('placeholder')}
+              className="w-full px-5 py-4 text-lg font-body border-4 border-black rounded-2xl bg-white text-black shadow-[6px_6px_0_#111] focus:outline-none placeholder-black/30"
+            />
+            {error && (
+              <div className="space-y-2">
+                <p className="text-center text-[#E8432D] font-body font-bold text-sm">{error}</p>
+                {suggestions.length > 0 && (
+                  <div className="text-center">
+                    <p className="font-body text-xs text-fg-faint mb-2">{t('did_you_mean')}</p>
+                    <div className="flex gap-2 justify-center flex-wrap">
+                      {suggestions.map(s => (
+                        <button key={s} type="button" onClick={() => onSearch(s)}
+                          className="font-body text-sm font-bold px-4 py-2 bg-[#F7C948] text-black border-2 border-black rounded-xl shadow-[2px_2px_0_#111] btn-press"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              type="submit" disabled={!value.trim()}
+              className="w-full py-4 bg-[#E8432D] text-white font-display text-2xl border-4 border-black rounded-2xl shadow-[6px_6px_0_#111] btn-press disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {t('dive_btn')}
+            </button>
+
+            {/* Daily topic — elevated card button */}
+            <button
+              type="button" onClick={() => onSearch(dailyTopic)}
+              className="w-full flex items-center gap-3 py-3 px-4 border-2 rounded-2xl btn-press group transition-colors"
+              style={{ background: 'rgba(247,201,72,0.10)', borderColor: 'rgba(247,201,72,0.45)' }}
+            >
+              <span className="text-xl shrink-0">🔥</span>
+              <div className="flex-1 text-left min-w-0">
+                <p className="font-body text-[0.62rem] text-fg-faint uppercase tracking-widest leading-none mb-0.5">{t('daily_label')}</p>
+                <p className="font-display text-base text-fg truncate">{dailyTopic}</p>
+              </div>
+              <span className="font-body text-sm text-fg-faint group-hover:text-[#F7C948] transition-colors shrink-0" aria-hidden>→</span>
+            </button>
+          </motion.form>
+
+{likedTopics?.size > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+              className="w-full z-10 mt-5"
+            >
+              <p className="font-body text-xs text-fg-faint text-center md:text-left mb-2 uppercase tracking-widest">
+                {t('starred_label')}
+              </p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                {[...likedTopics].slice(0, 6).map(topic => (
+                  <button
+                    key={topic} type="button" onClick={() => onSearch(topic)}
+                    className="font-body text-sm font-semibold px-3 py-1.5 bg-red-500 text-white border-2 border-black rounded-full shadow-[2px_2px_0_#111] btn-press"
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* RIGHT: Earth — desktop only */}
         <motion.div
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-          className="w-full max-w-md z-10 mt-5"
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="hidden md:flex items-center justify-center flex-shrink-0 z-10"
         >
-          <p className="font-body text-xs text-fg-faint text-center mb-2 uppercase tracking-widest">
-            {t('starred_label')}
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {[...likedTopics].slice(0, 6).map(topic => (
-              <button
-                key={topic} type="button" onClick={() => onSearch(topic)}
-                className="font-body text-sm font-semibold px-3 py-1.5 bg-red-500 text-white border-2 border-black rounded-full shadow-[2px_2px_0_#111] btn-press"
-              >
-                {topic}
-              </button>
-            ))}
-          </div>
+          <EarthWithGlow size={240} />
         </motion.div>
-      )}
+      </div>
     </motion.div>
   );
 }
@@ -318,11 +369,20 @@ function LoadingPhase() {
   return (
     <motion.div
       key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] gap-4"
+      className="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] gap-5"
     >
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}>
-        <PixelEarth size={80} animate={false} />
-      </motion.div>
+      <div className="relative">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}>
+          <PixelEarth size={80} animate={false} />
+        </motion.div>
+        <motion.div
+          className="absolute -right-7 bottom-1"
+          animate={{ y: [0, -5, 0], rotate: [0, 8, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <PixelWorm width={36} />
+        </motion.div>
+      </div>
       <p className="font-display text-2xl text-fg">{t('loading')}</p>
     </motion.div>
   );
@@ -425,8 +485,9 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
       .catch(() => { setFullIntro(''); setLoadingIntro(false); });
   }, [detailLevel, fullIntro, loadingIntro, topicData.title, lang]);
 
-  const textSource = detailLevel === 'learn' ? (fullIntro ?? topicData.extract) : topicData.extract;
-  const paragraphs = extractParagraphs(textSource, detailLevel);
+  const paragraphs = detailLevel === 'learn'
+    ? extractParagraphs(fullIntro ?? topicData.extract, 'learn')
+    : [];
 
   return (
     <motion.div
@@ -464,6 +525,12 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
           >
             Wikipedia ↗
           </a>
+          <a
+            href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noreferrer"
+            className="font-body text-[9px] text-fg-faint/60 hover:text-fg-faint underline transition-colors text-center"
+          >
+            CC-BY-SA
+          </a>
         </div>
       </div>
 
@@ -488,52 +555,34 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
       {/* Two-column body */}
       <div className="flex flex-col md:flex-row gap-5 mb-5">
 
-        {/* LEFT — Images (falls back to quick facts if none available) */}
-        <div className="md:w-56 lg:w-64 shrink-0">
-          {loadingImages ? (
-            <div className="flex flex-col gap-3">
-              {[180, 140].map((h, i) => (
-                <div key={i} className="card shadow-[4px_4px_0_#111] overflow-hidden animate-pulse"
-                  style={{ height: h, background: 'rgba(0,0,0,0.06)' }} />
-              ))}
-            </div>
-          ) : images.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              {images.slice(0, 4).map((img, i) => (
-                <motion.div
-                  key={img.url}
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.06 * i }}
-                  className="card shadow-[4px_4px_0_#111] overflow-hidden"
-                >
-                  <img src={img.url} alt={img.title}
-                    className="w-full object-cover block"
-                    style={{ maxHeight: '170px' }} />
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <div className="card shadow-[6px_6px_0_#111] p-5 h-full">
-              <h2 className="font-display text-lg text-black mb-3">{t('quick_facts')}</h2>
-              {facts.length > 0 ? (
-                <ul className="space-y-3">
-                  {facts.map((fact, i) => (
-                    <motion.li key={i}
-                      initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.07 * i, duration: 0.3 }}
-                      className="flex gap-2 items-start"
-                    >
-                      <span className="font-display text-[#E8432D] text-sm mt-0.5 shrink-0">{i + 1}.</span>
-                      <p className="font-body text-sm text-black/80 leading-relaxed">{fact}</p>
-                    </motion.li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="font-body text-sm text-black/50 italic">{t('check_article')}</p>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Images — vertical column on desktop, horizontal scroll on mobile */}
+        {(loadingImages || images.length > 0) && (
+          <div className="md:w-56 lg:w-64 md:shrink-0">
+            {loadingImages ? (
+              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+                {[180, 140].map((h, i) => (
+                  <div key={i} className="card shadow-[4px_4px_0_#111] overflow-hidden animate-pulse shrink-0 md:shrink md:w-auto"
+                    style={{ height: h, width: 160, background: 'rgba(0,0,0,0.06)' }} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+                {images.slice(0, 4).map((img, i) => (
+                  <motion.div
+                    key={img.url}
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.06 * i }}
+                    className="card shadow-[4px_4px_0_#111] overflow-hidden shrink-0 w-40 md:w-auto md:shrink"
+                  >
+                    <img src={img.url} alt={img.title}
+                      className="w-full object-cover block"
+                      style={{ maxHeight: '170px', height: '120px' }} />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* RIGHT — Article paragraphs */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
@@ -545,9 +594,33 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
               )}
 
               <div className="card shadow-[6px_6px_0_#111] p-5 flex-1">
-                <h2 className="font-display text-lg text-black mb-3">{t('about')}</h2>
+                <h2 className="font-display text-lg text-black mb-3">
+                  {detailLevel === 'some' ? t('quick_facts') : t('about')}
+                </h2>
                 <AnimatePresence mode="wait">
-                  {loadingIntro ? (
+                  {detailLevel === 'some' ? (
+                    <motion.div key="some"
+                      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {facts.length > 0 ? (
+                        <ul className="space-y-3">
+                          {facts.map((fact, i) => (
+                            <motion.li key={i}
+                              initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.06 * i, duration: 0.3 }}
+                              className="flex gap-2 items-start"
+                            >
+                              <span className="font-display text-[#E8432D] text-sm mt-0.5 shrink-0">{i + 1}.</span>
+                              <p className="font-body text-sm text-black/80 leading-relaxed">{fact}</p>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="font-body text-sm text-black/50 italic">{t('check_article')}</p>
+                      )}
+                    </motion.div>
+                  ) : loadingIntro ? (
                     <motion.div key="loading-intro"
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                       className="space-y-2 py-1"
@@ -558,18 +631,14 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
                       ))}
                     </motion.div>
                   ) : (
-                    <motion.div
-                      key={detailLevel}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
+                    <motion.div key="learn"
+                      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
                       {paragraphs.length > 0 ? (
                         <div className="space-y-3">
                           {paragraphs.map((para, i) => (
-                            <motion.p
-                              key={i}
+                            <motion.p key={i}
                               initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.05 * i, duration: 0.3 }}
                               className="font-body text-[0.95rem] text-black/80 leading-relaxed"
@@ -695,8 +764,8 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
         <span className="text-xs opacity-90">{layerLabel}</span>
       </motion.div>
 
-      <p className="font-display text-xl text-fg mb-1">{t('related_card')}</p>
-      <p className="font-body text-sm text-fg-muted mb-5 tracking-wide">
+      <p className="font-display text-xl text-white mb-1">{t('related_card')}</p>
+      <p className="font-body text-sm text-white/65 mb-5 tracking-wide">
         {t('swipe_hint', { n: topicIndex + 1, total })}
       </p>
 
@@ -704,7 +773,7 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
         <motion.span style={{ opacity: skipOpacity }} className="font-display text-lg text-[#E8432D]">
           {t('skip_left')}
         </motion.span>
-        <motion.span style={{ opacity: diveOpacity }} className="font-display text-lg text-green-400">
+        <motion.span style={{ opacity: diveOpacity }} className="font-display text-lg text-[#F7C948]">
           {t('dive_in')}
         </motion.span>
       </div>
@@ -743,7 +812,7 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
           {t('skip_left')}
         </button>
         <button onClick={onSwipeRight}
-          className="flex-1 py-3 font-display text-lg bg-green-500 text-white border-4 border-black rounded-2xl shadow-[4px_4px_0_#111] btn-press"
+          className="flex-1 py-3 font-display text-lg bg-[#F7C948] text-black border-4 border-black rounded-2xl shadow-[4px_4px_0_#111] btn-press"
         >
           {t('dive_in')}
         </button>
@@ -751,14 +820,14 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
 
       <div className="flex items-center justify-center gap-5 mt-4">
         <button onClick={onNewSearch}
-          className="font-body text-sm text-fg-faint hover:text-fg underline transition-colors"
+          className="font-body text-sm text-white/45 hover:text-white underline transition-colors"
         >
           {t('start_over')}
         </button>
-        <span className="text-fg-faint text-xs">·</span>
+        <span className="text-white/25 text-xs">·</span>
         <button
           onClick={() => { onDownvote(topic.title); onSwipeLeft(); }}
-          className="font-body text-sm text-fg-faint hover:text-[#E8432D] transition-colors flex items-center gap-1"
+          className="font-body text-sm text-white/45 hover:text-[#E8432D] transition-colors flex items-center gap-1"
         >
           👎 {t('downvote_btn')}
         </button>
@@ -770,15 +839,6 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
 // ─── Phase 6: Done ────────────────────────────────────────────────────────────
 function DonePhase({ topic, chain, badge, onNewSearch }) {
   const { t } = useLanguage();
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = () => {
-    const encoded = chain.map(encodeURIComponent).join('|');
-    const url = `${window.location.origin}${window.location.pathname}?trail=${encoded}`;
-    navigator.clipboard.writeText(url)
-      .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })
-      .catch(() => {});
-  };
 
   return (
     <motion.div
@@ -809,14 +869,9 @@ function DonePhase({ topic, chain, badge, onNewSearch }) {
         >
           {t('new_hole')}
         </button>
-        {chain.length > 1 && (
-          <motion.button onClick={handleShare} whileTap={{ scale: 0.96 }}
-            className="px-6 py-3 font-display text-lg text-black bg-white border-4 border-black rounded-2xl shadow-[4px_4px_0_#111] btn-press"
-          >
-            {copied ? t('link_copied') : t('share_trail')}
-          </motion.button>
-        )}
+        <SocialShare chain={chain} startTopic={topic} />
       </div>
+
     </motion.div>
   );
 }
@@ -829,7 +884,8 @@ export default function Home() {
   const [facts, setFacts]           = useState([]);
   const [related, setRelated]       = useState([]);
   const [relIdx, setRelIdx]         = useState(0);
-  const [sharedTrail, setSharedTrail] = useState(null);
+  const [sharedTrail, setSharedTrail]   = useState(null);
+  const [suggestions, setSuggestions]   = useState([]);
 
   const { startSession, addToChain, isLiked, toggleLike, likedTopics } = useHistory();
   const { recordDive, recordDepth }                                      = useStreak();
@@ -842,18 +898,23 @@ export default function Home() {
   const chainRef      = useRef([]);
   const dimensionRef  = useRef(false);
   const factsTimerRef = useRef(null);
+  const resetRef      = useRef(null);
+  const searchIdRef   = useRef(0);
 
   useEffect(() => {
     const params   = new URLSearchParams(window.location.search);
     const rawTrail = params.get('trail');
     if (rawTrail) {
-      const trail = rawTrail.split('|').map(decodeURIComponent).filter(Boolean);
+      const trail = rawTrail.split('|')
+        .map(s => { try { return decodeURIComponent(s); } catch { return ''; } })
+        .filter(Boolean)
+        .map(s => s.slice(0, 150));
       if (trail.length > 0) setSharedTrail(trail);
     }
     const q = params.get('q');
     if (q) {
       window.history.replaceState({}, '', window.location.pathname);
-      runSearch(decodeURIComponent(q));
+      runSearch(decodeURIComponent(q).slice(0, 150));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -868,10 +929,13 @@ export default function Home() {
   };
 
   const runSearch = async (query, continueSession = false) => {
+    const searchId = ++searchIdRef.current;
     setError(null);
+    setSuggestions([]);
     setPhase('loading');
     try {
       const data = await searchTopic(query, lang);
+      if (searchId !== searchIdRef.current) return;
       seenRef.current.add(data.title.toLowerCase());
 
       const [f, allRel] = await Promise.all([
@@ -904,7 +968,7 @@ export default function Home() {
       if (depth >= 10) awardTrophy('hop_10');
       if (depth >= 25) awardTrophy('hop_25');
 
-      const daily = getDailyTopic();
+      const daily = getDailyTopic(lang);
       if (data.title.toLowerCase().includes(daily.toLowerCase())) {
         awardTrophy('daily');
       }
@@ -919,6 +983,8 @@ export default function Home() {
         awardTrophy('hop_50');
         awardTrophy('dimension');
         setPhase('dimension');
+      } else if (localStorage.getItem('dth-skip-transition') === 'true') {
+        setPhase('facts');
       } else {
         setPhase('transition');
         advanceToFacts();
@@ -933,6 +999,8 @@ export default function Home() {
           goToDone();
         }
       } else {
+        const sug = await searchSuggestions(query, lang);
+        setSuggestions(sug);
         setError(t('not_found'));
         setPhase('input');
       }
@@ -952,6 +1020,13 @@ export default function Home() {
     setError(null);
     sessionRef.current = null;
   };
+  resetRef.current = reset;
+
+  useEffect(() => {
+    const h = () => resetRef.current?.();
+    window.addEventListener('dth-go-home', h);
+    return () => window.removeEventListener('dth-go-home', h);
+  }, []);
 
   const swipeRight = () => runSearch(related[relIdx].title, true);
   const swipeLeft  = () => {
@@ -988,6 +1063,7 @@ export default function Home() {
       <AnimatePresence mode="wait">
         {phase === 'input' && (
           <InputPhase key="input" onSearch={q => runSearch(q)} error={error}
+            suggestions={suggestions}
             sharedTrail={sharedTrail} likedTopics={likedTopics} />
         )}
         {phase === 'loading'    && <LoadingPhase key="loading" />}

@@ -1,13 +1,14 @@
 export const EN = {
   // Nav
+  nav_home:  'Home',
   nav_how:   'How it works',
-  nav_holes: '🐰 Your holes',
+  nav_holes: '🐰 My holes',
   nav_light: 'Switch to light mode',
   nav_dark:  'Switch to dark mode',
   nav_lang:  'FR',
 
   // Input
-  tagline:       'Explore anything. Learn everything.',
+  tagline:       'Fall in. Come out smarter.',
   placeholder:   'try: black holes, jazz, octopuses…',
   dive_btn:      'Dive in 🐰',
   daily_label:   "Today's hole:",
@@ -56,9 +57,10 @@ export const EN = {
   share_trail:  '🔗 Share this trail',
   link_copied:  '✓ Link copied!',
   not_found:    "Couldn't find that topic — try something else!",
+  did_you_mean: 'Did you mean…',
 
   // Rabbit Holes page
-  your_holes:     'YOUR RABBIT HOLES',
+  your_holes:     'MY HOLES',
   dives_one:      '1 dive recorded',
   dives_many:     '{n} dives recorded',
   clear_all:      'Clear all',
@@ -81,6 +83,11 @@ export const EN = {
   no_holes_sub:   'Go explore something and your journey will appear here.',
   start_diving:   'Start diving →',
   peeked_in:      'Peeked in — no dive yet',
+
+  // Settings
+  settings_title:    'Settings',
+  skip_anim_label:   'Skip transition animation',
+  skip_anim_sub:     'Go straight to facts without the zoom-in effect.',
 
   // How It Works page
   how_title:    'HOW IT WORKS',
@@ -156,18 +163,204 @@ export const EN = {
   // OG trophy
   trophy_og_rabbit_name: 'The O.G.',
   trophy_og_rabbit_desc: 'Down the original rabbit hole',
+
+  // Social share
+  share_social:      'Share',
+  share_x_btn:       'X',
+  share_fb_btn:      'Facebook',
+  share_ig_btn:      'Copy for Instagram',
+  share_copied:      '✓ Copied!',
+  share_text_multi:  'I went {n} hops deep: {trail} 🕳️ Down The Hole',
+  share_text_single: 'I explored {topic} on Down The Hole 🐰',
+};
+
+export const ES = {
+  // Nav
+  nav_home:  'Inicio',
+  nav_how:   'Cómo funciona',
+  nav_holes: '🐰 Mis madrigueras',
+  nav_light: 'Cambiar a modo claro',
+  nav_dark:  'Cambiar a modo oscuro',
+  nav_lang:  'ES',
+
+  // Input
+  tagline:       'Cae. Sal más listo.',
+  placeholder:   'prueba: agujeros negros, jazz, pulpos…',
+  dive_btn:      'Explorar 🐰',
+  daily_label:   'Tema del día:',
+  starred_label: '♥ Favoritos',
+  shared_trail:  '🔗 Recorrido compartido',
+  continue_from: 'Continuar desde {topic} →',
+
+  // Loading
+  loading: 'Excavando…',
+
+  // Transition
+  going_down: 'Bajando por el agujero…',
+  skip_btn:   'Saltar →',
+
+  // Facts
+  quick_facts:   '✦ Datos rápidos',
+  about:         '📖 Acerca de',
+  check_article: 'Ver el artículo completo.',
+  no_text:       'No hay texto disponible.',
+  new_topic:     '← Nuevo tema',
+  related_btn:   'Temas relacionados →',
+  detail_some:   'Hmm, interesante',
+  detail_learn:  'Profundicemos más',
+
+  // Swipe card
+  related_card: 'Madriguera relacionada',
+  swipe_hint:   '{n} / {total} — desliza o toca',
+  skip_left:    '← Saltar',
+  dive_in:      'Explorar →',
+  start_over:   '← Empezar de nuevo',
+  hop:          'salto',
+  hops:         'saltos',
+
+  // Dimension easter egg
+  too_deep_1:       'HAS IDO',
+  too_deep_2:       'DEMASIADO LEJOS',
+  too_deep_sub:     '50 saltos. Rompiste la realidad.',
+  trophy_unlocked:  '🏆 Trofeo desbloqueado',
+  bh_legendary:     'Legendario · Solo los más profundos',
+  continue_btn:     'Continuar →',
+
+  // Done
+  explored_all: '¡Lo has explorado todo!',
+  no_more:      'No más madrigueras desde {topic}. ¡Es hora de excavar en otro lugar!',
+  new_hole:     'Nueva madriguera 🌍',
+  share_trail:  '🔗 Compartir este recorrido',
+  link_copied:  '✓ ¡Enlace copiado!',
+  not_found:    'Tema no encontrado — ¡prueba con otra cosa!',
+  did_you_mean: '¿Quisiste decir…',
+
+  // Rabbit Holes page
+  your_holes:     'MIS MADRIGUERAS',
+  dives_one:      '1 exploración registrada',
+  dives_many:     '{n} exploraciones registradas',
+  clear_all:      'Borrar todo',
+  stat_streak:    '🔥 Racha',
+  stat_best:      '📈 Mejor',
+  stat_deepest:   '🕳️ Más profundo',
+  stat_total:     '📚 Total',
+  keep_going:     '¡sigue así!',
+  start_today:    'empieza hoy',
+  longest_streak: 'racha más larga',
+  hops_p:         'saltos',
+  hop_s:          'salto',
+  dives_p:        'exploraciones',
+  trophies_title: '🏆 Trofeos',
+  trophies_earned:'obtenidos',
+  starred_title:  '♥ Favoritos',
+  redive:         'Volver a explorar →',
+  remove_starred: 'Quitar de favoritos',
+  no_holes:       'Sin madrigueras',
+  no_holes_sub:   'Explora algo y tu viaje aparecerá aquí.',
+  start_diving:   'Comenzar →',
+  peeked_in:      'Solo un vistazo — aún sin explorar',
+
+  // Settings
+  settings_title:    'Ajustes',
+  skip_anim_label:   'Saltar animación de transición',
+  skip_anim_sub:     'Ir directo a los datos sin el efecto de zoom.',
+
+  // How It Works page
+  how_title:    'CÓMO FUNCIONA',
+  how_sub:      'Aprender disfrazado de scroll.',
+  how_ready:    '¿Listo?',
+  how_waiting:  'La madriguera te espera.',
+  start_exploring: 'Comenzar a explorar →',
+  step_0_label: 'Paso 1',
+  step_0_title: 'Elige un tema',
+  step_0_desc:  'Escribe cualquier cosa — una persona, lugar, concepto o palabra que cruzó tu mente.',
+  step_1_label: 'Paso 2',
+  step_1_title: 'Baja por el agujero',
+  step_1_desc:  'Nos adentramos en Wikipedia y extraemos los datos más interesantes. Sin muros de texto, sin anuncios.',
+  step_2_label: 'Paso 3',
+  step_2_title: 'Desliza para explorar',
+  step_2_desc:  'Desliza a la derecha (o toca "Explorar") para profundizar en un tema relacionado. Desliza a la izquierda para saltarlo.',
+  step_3_label: 'Paso 4',
+  step_3_title: 'Sigue el conejo',
+  step_3_desc:  'Empezaste con jazz y acabaste leyendo sobre física cuántica. Ese es todo el punto.',
+
+  // Trophy toast header
+  toast_label: '🏆 Trofeo desbloqueado',
+
+  // Trophies
+  trophy_first_dive_name:  'Primera madriguera',
+  trophy_first_dive_desc:  'Completa tu primera exploración',
+  trophy_hop_5_name:       'Conejo',
+  trophy_hop_5_desc:       'Alcanza 5 saltos en una sesión',
+  trophy_hop_10_name:      'Caminante del Vacío',
+  trophy_hop_10_desc:      'Alcanza 10 saltos en una sesión',
+  trophy_hop_25_name:      'Excavador de Tierra',
+  trophy_hop_25_desc:      'Alcanza el núcleo terrestre (25 saltos)',
+  trophy_hop_50_name:      'Agujero Negro',
+  trophy_hop_50_desc:      'Rompe la realidad a 50 saltos',
+  trophy_dimension_name:   'Dimensionaut',
+  trophy_dimension_desc:   'Sobrevive otra dimensión',
+  trophy_streak_3_name:    'En llamas',
+  trophy_streak_3_desc:    'Racha de 3 días explorando',
+  trophy_streak_7_name:    'Obsesivo semanal',
+  trophy_streak_7_desc:    'Racha de 7 días explorando',
+  trophy_streak_30_name:   'Curiosidad crónica',
+  trophy_streak_30_desc:   'Racha de 30 días explorando',
+  trophy_total_10_name:    'Viajero del mundo',
+  trophy_total_10_desc:    'Completa 10 sesiones en total',
+  trophy_total_50_name:    'Enciclopedista',
+  trophy_total_50_desc:    'Completa 50 sesiones en total',
+  trophy_starred_5_name:   'Curador',
+  trophy_starred_5_desc:   'Guarda 5 temas en favoritos',
+  trophy_daily_name:       'Ritualista diario',
+  trophy_daily_desc:       'Completa el tema del día',
+
+  // Depth badge keys
+  badge_toe:      'Probador',
+  badge_hopper:   'Saltador de madrigueras',
+  badge_rabbit:   'Conejo',
+  badge_spiraler: 'Espiralizador',
+  badge_void:     'Caminante del vacío',
+
+  // Streak badge keys
+  sbadge_fire:    'En llamas',
+  sbadge_weekly:  'Obsesivo semanal',
+  sbadge_chronic: 'Curiosidad crónica',
+
+  // Rarity
+  rarity_common:    'común',
+  rarity_rare:      'raro',
+  rarity_epic:      'épico',
+  rarity_legendary: 'legendario',
+
+  // Downvote
+  downvote_btn: 'No me interesa',
+
+  // OG trophy
+  trophy_og_rabbit_name: 'El O.G.',
+  trophy_og_rabbit_desc: 'La madriguera original',
+
+  // Social share
+  share_social:      'Compartir',
+  share_x_btn:       'X',
+  share_fb_btn:      'Facebook',
+  share_ig_btn:      'Copiar para Instagram',
+  share_copied:      '✓ ¡Copiado!',
+  share_text_multi:  'Hice {n} saltos: {trail} 🕳️ Down The Hole',
+  share_text_single: 'Exploré {topic} en Down The Hole 🐰',
 };
 
 export const FR = {
   // Nav
+  nav_home:  'Accueil',
   nav_how:   'Comment ça marche',
-  nav_holes: '🐰 Tes terriers',
+  nav_holes: '🐰 Mes terriers',
   nav_light: 'Passer en mode clair',
   nav_dark:  'Passer en mode sombre',
   nav_lang:  'EN',
 
   // Input
-  tagline:       'Explore tout. Apprends sans limites.',
+  tagline:       'Tombez. Ressortez plus malin.',
   placeholder:   'essaie : trous noirs, jazz, pieuvres…',
   dive_btn:      'Plonger 🐰',
   daily_label:   'Le trou du jour :',
@@ -216,9 +409,10 @@ export const FR = {
   share_trail:  '🔗 Partager ce parcours',
   link_copied:  '✓ Lien copié !',
   not_found:    'Sujet introuvable — essaie autre chose !',
+  did_you_mean: 'Tu voulais dire…',
 
   // Rabbit Holes page
-  your_holes:     'VOS TERRIERS',
+  your_holes:     'MES TERRIERS',
   dives_one:      '1 plongée enregistrée',
   dives_many:     '{n} plongées enregistrées',
   clear_all:      'Tout effacer',
@@ -241,6 +435,11 @@ export const FR = {
   no_holes_sub:   'Explore quelque chose et ton parcours apparaîtra ici.',
   start_diving:   'Commencer →',
   peeked_in:      "Juste un coup d'œil — pas encore plongé",
+
+  // Settings
+  settings_title:    'Paramètres',
+  skip_anim_label:   "Passer l'animation de transition",
+  skip_anim_sub:     'Aller directement aux faits sans l\'effet de zoom.',
 
   // How It Works page
   how_title:    'COMMENT ÇA MARCHE',
@@ -316,4 +515,13 @@ export const FR = {
   // OG trophy
   trophy_og_rabbit_name: 'Le O.G.',
   trophy_og_rabbit_desc: 'Le terrier originel',
+
+  // Social share
+  share_social:      'Partager',
+  share_x_btn:       'X',
+  share_fb_btn:      'Facebook',
+  share_ig_btn:      'Copier pour Instagram',
+  share_copied:      '✓ Copié !',
+  share_text_multi:  'J\'ai fait {n} sauts : {trail} 🕳️ Down The Hole',
+  share_text_single: 'J\'ai exploré {topic} sur Down The Hole 🐰',
 };

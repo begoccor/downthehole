@@ -14,6 +14,20 @@ async function safeFetch(url) {
   return res.json();
 }
 
+export async function searchSuggestions(query, lang = 'en') {
+  const slug = encodeURIComponent(query.trim());
+  const url = `${MW(lang)}?action=query&list=search&srsearch=${slug}&srlimit=3&format=json&origin=*`;
+  try {
+    const data = await safeFetch(url);
+    return (data.query?.search ?? [])
+      .map(h => h.title)
+      .filter(t => t.toLowerCase() !== query.trim().toLowerCase())
+      .slice(0, 2);
+  } catch {
+    return [];
+  }
+}
+
 export async function searchTopic(query, lang = 'en') {
   const slug = encodeURIComponent(query.trim());
 
@@ -81,6 +95,7 @@ export async function fetchArticleImages(title, lang = 'en') {
 
     const SKIP = ['logo', 'flag', 'icon', 'coat', 'blank', 'seal', 'symbol', 'badge', 'emblem', 'ambox', 'commons', 'magnify', 'question', 'wikimedia', 'edit'];
 
+    const seen = new Set();
     return Object.values(pages)
       .filter(p => {
         const info = p.imageinfo?.[0];
@@ -88,7 +103,10 @@ export async function fetchArticleImages(title, lang = 'en') {
         if (!['image/jpeg', 'image/png', 'image/webp'].includes(info.mime)) return false;
         if ((info.width || 0) < 200 || (info.height || 0) < 150) return false;
         const name = (p.title || '').toLowerCase();
-        return !SKIP.some(w => name.includes(w));
+        if (SKIP.some(w => name.includes(w))) return false;
+        if (seen.has(info.url)) return false;
+        seen.add(info.url);
+        return true;
       })
       .map(p => ({
         url: p.imageinfo[0].url,

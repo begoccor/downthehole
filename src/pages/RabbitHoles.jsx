@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useHistory } from '../hooks/useHistory';
@@ -6,6 +6,7 @@ import { useStreak, getStreakBadge } from '../hooks/useStreak';
 import { useTrophies } from '../contexts/TrophyContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { TROPHIES, RARITY_STYLES } from '../data/trophies';
+import SocialShare from '../components/SocialShare';
 
 function fmt(iso) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -19,6 +20,15 @@ export default function RabbitHoles() {
   const { earned, awardTrophy } = useTrophies();
   const { t } = useLanguage();
   const streakBadge = getStreakBadge(streak.current);
+  const [skipAnim, setSkipAnim] = useState(
+    () => localStorage.getItem('dth-skip-transition') === 'true'
+  );
+
+  const toggleSkipAnim = () => {
+    const next = !skipAnim;
+    setSkipAnim(next);
+    localStorage.setItem('dth-skip-transition', String(next));
+  };
 
   useEffect(() => {
     if (streak.total === 0 && history.length > 0) {
@@ -149,10 +159,10 @@ export default function RabbitHoles() {
                     </Link>
                     <button
                       onClick={() => toggleLike(topic)}
-                      className="font-body text-xs px-3 py-2 border-2 border-black/20 rounded-xl text-black/45 hover:border-black hover:text-black transition-all"
+                      className="font-body text-xs px-3 py-2 border-2 border-red-400 rounded-xl text-red-500 hover:bg-red-50 transition-all"
                       title={t('remove_starred')}
                     >
-                      ♡
+                      ♥
                     </button>
                   </div>
                 </motion.div>
@@ -161,6 +171,26 @@ export default function RabbitHoles() {
           </div>
         </div>
       )}
+
+      {/* Settings */}
+      <div className="mb-8">
+        <h2 className="font-display text-2xl text-fg mb-4">{t('settings_title')}</h2>
+        <div className="card shadow-[4px_4px_0_#111] p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-body font-bold text-sm text-black">{t('skip_anim_label')}</p>
+              <p className="font-body text-xs text-black/50 mt-0.5">{t('skip_anim_sub')}</p>
+            </div>
+            <button
+              onClick={toggleSkipAnim}
+              className={`relative w-12 h-6 rounded-full border-2 border-black transition-colors flex-shrink-0 overflow-hidden p-0 ${skipAnim ? 'bg-[#E8432D]' : 'bg-black/10'}`}
+              aria-label={t('skip_anim_label')}
+            >
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-all duration-200 ${skipAnim ? 'left-6' : 'left-0.5'}`} />
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Empty state */}
       {history.length === 0 && (
@@ -199,19 +229,22 @@ export default function RabbitHoles() {
               <span className="font-body text-xs text-black/40 shrink-0 mt-1">{fmt(session.timestamp)}</span>
             </div>
             {session.chain.length > 1 ? (
-              <div className="flex flex-wrap gap-2 items-center">
-                {session.chain.map((topic, j) => (
-                  <span key={j} className="flex items-center gap-2">
-                    <span className="font-body text-sm bg-[#F7C948] border-2 border-black rounded-full px-3 py-1 font-semibold flex items-center gap-1">
-                      {topic}
-                      {isLiked(topic) && <span className="text-red-500 text-xs">♥</span>}
+              <>
+                <div className="flex flex-wrap gap-2 items-center">
+                  {session.chain.map((topic, j) => (
+                    <span key={j} className="flex items-center gap-2">
+                      <span className="font-body text-sm bg-[#F7C948] border-2 border-black rounded-full px-3 py-1 font-semibold flex items-center gap-1">
+                        {topic}
+                        {isLiked(topic) && <span className="text-red-500 text-xs">♥</span>}
+                      </span>
+                      {j < session.chain.length - 1 && (
+                        <span className="text-black/30 font-bold text-lg">→</span>
+                      )}
                     </span>
-                    {j < session.chain.length - 1 && (
-                      <span className="text-black/30 font-bold text-lg">→</span>
-                    )}
-                  </span>
-                ))}
-              </div>
+                  ))}
+                </div>
+                <SocialShare chain={session.chain} startTopic={session.startTopic} compact />
+              </>
             ) : (
               <p className="font-body text-sm text-black/40 italic">{t('peeked_in')}</p>
             )}

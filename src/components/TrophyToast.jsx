@@ -15,12 +15,18 @@ export default function TrophyToast() {
           animate={{ opacity: 1, y: 0,   scale: 1   }}
           exit={{    opacity: 0, y: -70, scale: 0.9 }}
           transition={{ type: 'spring', bounce: 0.4 }}
-          onClick={clearToast}
-          className={`fixed top-20 left-1/2 -translate-x-1/2 z-[60] cursor-pointer
+          className={`fixed top-20 left-1/2 -translate-x-1/2 z-[60]
             card border-4 ${RARITY_STYLES[toast.rarity].border}
             ${RARITY_STYLES[toast.rarity].glow}
-            px-5 py-3 flex items-center gap-3 whitespace-nowrap`}
+            px-5 py-3 pr-10 flex items-center gap-3 whitespace-nowrap`}
         >
+          <button
+            onClick={clearToast}
+            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-lg text-black/30 hover:text-black hover:bg-black/8 transition-colors text-sm font-bold"
+            aria-label="Close"
+          >
+            ✕
+          </button>
           <motion.span
             animate={{ rotate: [0, -15, 15, 0], scale: [1, 1.2, 1] }}
             transition={{ duration: 0.5, delay: 0.2 }}

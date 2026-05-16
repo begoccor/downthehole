@@ -4,6 +4,7 @@
 @layer base {
   /* ─── Dark theme (default) ─────────────────────────────────────────────── */
   :root {
+    --input-glow: rgba(232,67,45,0.07);
     --bg:        #0C0A1E;
     --surface:   #16132D;
     --nav-bg:    #0C0A1E;
@@ -23,8 +24,9 @@
 
   /* ─── Light theme ──────────────────────────────────────────────────────── */
   [data-theme="light"] {
-    --bg:        #FAFAF7;
-    --surface:   #F0EDE4;
+    --input-glow: rgba(247,201,72,0.14);
+    --bg:        #FFFFFF;
+    --surface:   #F2F2F2;
     --nav-bg:    #FFFFFF;
     --nav-border: rgba(0, 0, 0, 0.10);
     --hole:      #D4CCE8;

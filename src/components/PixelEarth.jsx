@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-// B = ocean blue, G = land green, L = lighter blue (highlight), _ = transparent
+// B = ocean, G = land green, L = highlight blue, _ = transparent
 const COLORS = {
   B: '#3B8ED6',
   G: '#4CB86A',
@@ -9,64 +9,66 @@ const COLORS = {
   _: null,
 };
 
-// 16×16 grid — 3 rotation frames
+// Symmetric 16×16 circle (r≈8.5, center 7.5,7.5)
+// Row widths: 4,8,10,12,14,14,16,16,16,16,14,14,12,10,8,4
+// Frame rotation: Americas → Europe/Africa → Asia
 const FRAMES = [
-  // Frame 1: Americas
+  // Frame 1 — Americas
   [
     '______BBBB______',
-    '____BBBBBBBB____',
-    '___BBBBBBBBBB___',
-    '__BBBGBBBBBBBB__',
-    '__BBGGGBBBBBBB__',
+    '____LBGBBBBB____',
+    '___LBBGGBBBBB___',
+    '__LBBGGGBBBBBB__',
+    '_LBBBGGGBBBBBBB_',
     '_BBBGGGBBBBBBBB_',
-    '_BBBGGGGBBBBBBB_',
-    '_BBBBGGGBBBGBBB_',
-    '_BBBBBBBBBGGBBB_',
-    '_BBBBBBBBGGBBBB_',
-    '__BBBBBBBBBBB___',
-    '__BBBBBBBBBB____',
-    '___BBBBBBBB_____',
-    '____BBBBBB______',
-    '______BBB_______',
-    '________________',
+    'BBGGGGBBBBBBBBBB',
+    'BBBGGGBBBBBBBBBB',
+    'BBBBBGBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBB',
+    '_BBBBGBBBBBBBBB_',
+    '_BBBGGGBBBBBBBB_',
+    '__BBGGGBBBBBBB__',
+    '___BBGBBBBBBB___',
+    '____BGBBBBBB____',
+    '______GBBB______',
   ],
-  // Frame 2: Atlantic / Europe-Africa
+  // Frame 2 — Europe + Africa
   [
     '______BBBB______',
+    '____LBBBBBBB____',
+    '___LBBBGGBBBB___',
+    '__LBBBGGGGBBBB__',
+    '_LBBBBGGGGBBBBB_',
+    '_BBBBBBGGGBBBBB_',
+    'BBBBBGGGGGGBBBBB',
+    'BBBBBGGGGGGGBBBB',
+    'BBBBBGGGGGGBBBBB',
+    'BBBBBGGGGGBBBBBB',
+    '_BBBBGGGGGBBBBB_',
+    '_BBBBBGGGGBBBBB_',
+    '__BBBBGGGBBBBB__',
+    '___BBBBGGBBBB___',
     '____BBBBBBBB____',
+    '______BBBB______',
+  ],
+  // Frame 3 — Asia / Pacific
+  [
+    '______BBBB______',
+    '____LBBBBBGG____',
+    '___LBBBBBBGGG___',
+    '__LBBBBBBGGGGB__',
+    '_LBBBBBBBGGGGBB_',
+    '_BBBBBBBGGGBBBB_',
+    'BBBBBBBBBGGGBBBB',
+    'BBBBBBBBBBGBBBBB',
+    'BBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBB',
+    '_BBBBBBBBBBBBBB_',
+    '_BBBBBBBBBBBBBB_',
+    '__BBBBBBBBBBBB__',
     '___BBBBBBBBBB___',
-    '__BBBBBBGBBBBB__',
-    '__BBBBBGGBBBBB__',
-    '_BBBBBBGGGBBBB__',
-    '_BBBBBGGGBBBBB__',
-    '_BBBBBGGGBBBBB__',
-    '_BBBBBBGBBBBBB__',
-    '_BBBBBBBGBBBBB__',
-    '__BBBBBBBBBBB___',
-    '__BBBBBBBBBB____',
-    '___BBBBBBBB_____',
-    '____BBBBBB______',
-    '______BBB_______',
-    '________________',
-  ],
-  // Frame 3: Asia / Pacific
-  [
-    '______BBBB______',
     '____BBBBBBBB____',
-    '___BBBBBBBGGG___',
-    '__BBBBBBBGGGGB__',
-    '__BBBBBBGGGGBB__',
-    '_BBBBBBBGGGGBB__',
-    '_BBBBBBGGGGGB___',
-    '_BBBBBBBGGGBB___',
-    '_BBBBBBBBGGBB___',
-    '_BBBBBBBBBGB____',
-    '__BBBBBBBBBBB___',
-    '__BBBBBBBBBB____',
-    '___BBBBBBBB_____',
-    '____BBBBBB______',
-    '______BBB_______',
-    '________________',
+    '______BBBB______',
   ],
 ];
 
