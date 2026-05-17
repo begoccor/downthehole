@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+const SITE = 'https://www.followthehole.com';
+
 function buildShareUrl(chain) {
   const encoded = chain.map(encodeURIComponent).join('|');
-  return `${window.location.origin}/?trail=${encoded}`;
+  return `${SITE}/?trail=${encoded}`;
 }
 
 function XIcon() {
@@ -32,6 +34,7 @@ function IgIcon() {
 
 export default function SocialShare({ chain, startTopic, compact = false }) {
   const [copied, setCopied] = useState(false);
+  const [fbCopied, setFbCopied] = useState(false);
   const { t } = useLanguage();
 
   const n = chain.length;
@@ -44,7 +47,15 @@ export default function SocialShare({ chain, startTopic, compact = false }) {
   const shareUrl = buildShareUrl(chain);
 
   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-  const fbUrl    = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const fbPostText = `${shareText}\n\n🌍 ${shareUrl}`;
+
+  const shareToFacebook = () => {
+    navigator.clipboard.writeText(fbPostText).catch(() => {});
+    setFbCopied(true);
+    setTimeout(() => setFbCopied(false), 3000);
+    window.open(fbShareUrl, '_blank', 'noopener,noreferrer');
+  };
 
   const copyForIg = () => {
     navigator.clipboard.writeText(`${shareText}\n${shareUrl}`)
@@ -64,12 +75,20 @@ export default function SocialShare({ chain, startTopic, compact = false }) {
       >
         <XIcon />
       </a>
-      <a href={fbUrl} target="_blank" rel="noreferrer"
-        className={`${btnBase} bg-[#1877F2]`}
-        title={t('share_fb_btn')}
-      >
-        <FbIcon />
-      </a>
+      <div className="relative flex flex-col items-center">
+        <button
+          onClick={shareToFacebook}
+          className={`${btnBase} bg-[#1877F2]`}
+          title={t('share_fb_btn')}
+        >
+          <FbIcon />
+        </button>
+        {fbCopied && (
+          <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap font-body text-[10px] font-bold text-black/70 bg-[#F7C948] border border-black rounded-md px-2 py-0.5 pointer-events-none">
+            Paste in your post!
+          </span>
+        )}
+      </div>
       <button onClick={copyForIg}
         className={`${btnBase}`}
         style={{ background: 'linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)' }}

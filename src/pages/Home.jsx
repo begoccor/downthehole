@@ -209,7 +209,7 @@ function InputPhase({ onSearch, error, suggestions = [], sharedTrail, likedTopic
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.2 } }}
-      className="relative flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-6 py-10"
+      className="relative flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] px-6 py-10"
     >
       <Stars />
       {/* Film grain */}
@@ -369,7 +369,7 @@ function LoadingPhase() {
   return (
     <motion.div
       key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] gap-5"
+      className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] gap-5"
     >
       <div className="relative">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}>
@@ -559,26 +559,30 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
         {(loadingImages || images.length > 0) && (
           <div className="md:w-56 lg:w-64 md:shrink-0">
             {loadingImages ? (
-              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-                {[180, 140].map((h, i) => (
-                  <div key={i} className="card shadow-[4px_4px_0_#111] overflow-hidden animate-pulse shrink-0 md:shrink md:w-auto"
-                    style={{ height: h, width: 160, background: 'rgba(0,0,0,0.06)' }} />
-                ))}
+              <div className="overflow-x-auto md:overflow-visible pb-1 md:pb-0">
+                <div className="flex md:flex-col gap-3 w-max md:w-auto">
+                  {[180, 140].map((h, i) => (
+                    <div key={i} className="card shadow-[4px_4px_0_#111] overflow-hidden animate-pulse shrink-0 md:shrink md:w-auto"
+                      style={{ height: h, width: 160, background: 'rgba(0,0,0,0.06)' }} />
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-                {images.slice(0, 4).map((img, i) => (
-                  <motion.div
-                    key={img.url}
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.06 * i }}
-                    className="card shadow-[4px_4px_0_#111] overflow-hidden shrink-0 w-40 md:w-auto md:shrink"
-                  >
-                    <img src={img.url} alt={img.title}
-                      className="w-full object-cover block"
-                      style={{ maxHeight: '170px', height: '120px' }} />
-                  </motion.div>
-                ))}
+              <div className="overflow-x-auto md:overflow-visible pb-1 md:pb-0">
+                <div className="flex md:flex-col gap-3 w-max md:w-auto">
+                  {images.slice(0, 4).map((img, i) => (
+                    <motion.div
+                      key={img.url}
+                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.06 * i }}
+                      className="card shadow-[4px_4px_0_#111] overflow-hidden shrink-0 w-40 md:w-auto md:shrink"
+                    >
+                      <img src={img.url} alt={img.title}
+                        className="w-full object-cover block"
+                        style={{ maxHeight: '170px', height: '120px' }} />
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -697,7 +701,7 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
       key={`rel-${topicIndex}`}
       initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.15 } }}
-      className="relative flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-4 py-8"
+      className="relative flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] px-4 py-8"
     >
       {/* Pixel creatures — emerge progressively with depth */}
       <AnimatePresence>
@@ -843,7 +847,7 @@ function DonePhase({ topic, chain, badge, onNewSearch }) {
   return (
     <motion.div
       key="done" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-4 text-center"
+      className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] px-4 text-center"
     >
       <div className="mb-5"><PixelRabbit width={100} /></div>
       {badge && (
