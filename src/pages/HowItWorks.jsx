@@ -64,6 +64,22 @@ export default function HowItWorks() {
           {t('start_exploring')}
         </Link>
       </motion.div>
+
+      {/* Contact */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="text-center font-body text-sm text-fg-faint mt-8"
+      >
+        Got a question or idea?{' '}
+        <a
+          href="mailto:contact@followthehole.com"
+          className="text-fg-muted underline underline-offset-2 hover:text-fg transition-colors"
+        >
+          contact@followthehole.com
+        </a>
+      </motion.p>
     </div>
   );
 }

@@ -52,9 +52,11 @@ export default function SocialShare({ chain, startTopic, compact = false }) {
 
   const shareToFacebook = () => {
     navigator.clipboard.writeText(fbPostText).catch(() => {});
-    setFbCopied(true);
-    setTimeout(() => setFbCopied(false), 3000);
     window.open(fbShareUrl, '_blank', 'noopener,noreferrer');
+    setTimeout(() => {
+      setFbCopied(true);
+      setTimeout(() => setFbCopied(false), 3000);
+    }, 500);
   };
 
   const copyForIg = () => {
@@ -83,11 +85,12 @@ export default function SocialShare({ chain, startTopic, compact = false }) {
         >
           <FbIcon />
         </button>
-        {fbCopied && (
-          <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap font-body text-[10px] font-bold text-black/70 bg-[#F7C948] border border-black rounded-md px-2 py-0.5 pointer-events-none">
-            Paste in your post!
-          </span>
-        )}
+        <span
+          className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap font-body text-[10px] font-bold text-black/70 bg-[#F7C948] border border-black rounded-md px-2 py-0.5 pointer-events-none transition-opacity duration-300"
+          style={{ opacity: fbCopied ? 1 : 0 }}
+        >
+          Paste in your post!
+        </span>
       </div>
       <button onClick={copyForIg}
         className={`${btnBase}`}

@@ -3,7 +3,7 @@ import {
   motion, AnimatePresence,
   useMotionValue, useTransform,
 } from 'framer-motion';
-import { searchTopic, fetchRelated, fetchFullIntro, fetchArticleImages, extractFacts, searchSuggestions } from '../hooks/useWikipedia';
+import { searchTopic, fetchArticleLinks, fetchCameo, fetchFullIntro, fetchArticleImages, extractFacts, searchSuggestions } from '../hooks/useWikipedia';
 import SocialShare from '../components/SocialShare';
 import { useDownvotes } from '../hooks/useDownvotes';
 import { useHistory } from '../hooks/useHistory';
@@ -460,7 +460,7 @@ const DETAIL_LEVELS = [
 ];
 
 // ─── Phase 4: Facts ───────────────────────────────────────────────────────────
-function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
+function FactsPhase({ topicData, facts, cameo, onNext, onNewSearch, liked, onLike }) {
   const { lang, t } = useLanguage();
   const [detailLevel, setDetailLevel] = useState('some');
   const [fullIntro, setFullIntro]     = useState(null);  // null=unfetched, ''=empty
@@ -660,6 +660,40 @@ function FactsPhase({ topicData, facts, onNext, onNewSearch, liked, onLike }) {
               </div>
         </div>
       </div>
+
+      {/* Cameo — map for geographic places, quote for persons */}
+      {cameo?.type === 'map' && (
+        <motion.a
+          href={cameo.osmUrl} target="_blank" rel="noopener noreferrer"
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="card shadow-[4px_4px_0_#111] overflow-hidden flex mb-5 hover:shadow-[6px_6px_0_#111] transition-shadow"
+        >
+          <img
+            src={cameo.mapUrl} alt="Map"
+            className="object-cover shrink-0"
+            style={{ width: 130, height: 90 }}
+            onError={e => { e.currentTarget.closest('a').style.display = 'none'; }}
+          />
+          <div className="px-4 flex flex-col justify-center gap-0.5">
+            <p className="font-body text-[10px] text-black/40 uppercase tracking-widest">📍 OpenStreetMap</p>
+            <p className="font-body text-sm text-black/70">View on the map ↗</p>
+          </div>
+        </motion.a>
+      )}
+      {cameo?.type === 'quote' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="card shadow-[4px_4px_0_#111] p-4 mb-5"
+        >
+          <p className="font-body text-[10px] text-black/40 uppercase tracking-widest mb-2">💬 Wikiquote</p>
+          <blockquote className="font-body text-sm text-black/70 italic leading-relaxed">
+            &ldquo;{cameo.text}&rdquo;
+          </blockquote>
+          <p className="font-body text-[10px] text-black/40 mt-2 text-right">— {cameo.source}</p>
+        </motion.div>
+      )}
 
       {/* Action row */}
       <div className="flex gap-3">
@@ -890,6 +924,7 @@ export default function Home() {
   const [relIdx, setRelIdx]         = useState(0);
   const [sharedTrail, setSharedTrail]   = useState(null);
   const [suggestions, setSuggestions]   = useState([]);
+  const [cameo, setCameo]               = useState(null);
 
   const { startSession, addToChain, isLiked, toggleLike, likedTopics } = useHistory();
   const { recordDive, recordDepth }                                      = useStreak();
@@ -944,8 +979,13 @@ export default function Home() {
 
       const [f, allRel] = await Promise.all([
         Promise.resolve(extractFacts(data.extract)),
-        fetchRelated(data.title, lang),
+        fetchArticleLinks(data.title, lang),
       ]);
+
+      // Fire cameo fetch async — doesn't block phase transition
+      fetchCameo(data, lang)
+        .then(c => { if (searchId === searchIdRef.current) setCameo(c); })
+        .catch(() => {});
 
       const freshRel = allRel
         .filter(r => !seenRef.current.has(r.title.toLowerCase()))
@@ -1022,6 +1062,7 @@ export default function Home() {
     setRelated([]);
     setRelIdx(0);
     setError(null);
+    setCameo(null);
     sessionRef.current = null;
   };
   resetRef.current = reset;
@@ -1077,7 +1118,7 @@ export default function Home() {
           setPhase('facts');
         }} />}
         {phase === 'facts' && topicData && (
-          <FactsPhase key="facts" topicData={topicData} facts={facts}
+          <FactsPhase key="facts" topicData={topicData} facts={facts} cameo={cameo}
             liked={isLiked(topicData.title)}
             onLike={() => toggleLike(topicData.title)}
             onNext={() => related.length ? setPhase('related') : goToDone()}

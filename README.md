@@ -14,8 +14,8 @@ A Wikipedia rabbit-hole explorer disguised as a swipe game. Type any topic, dive
 - **Detail levels** — toggle between *Hmm, interesting* (quick read) and *Let's dive deeper* (full Wikipedia intro)
 - **Trophies** — 14 achievements unlocked by reaching depth milestones, streaks, and hidden searches
 - **Daily hole** — a new topic every day, same for everyone
-- **Share your trail** — copy a link that lets anyone continue your exact session
-- **EN / FR** — full bilingual support including searching French Wikipedia
+- **Share your trail** — share to X, Facebook, or Instagram with a pre-filled link and summary of your hole
+- **EN / FR / ES** — full trilingual support including searching Wikipedia in each language
 - **Dark / light mode**
 - **Fully offline-capable** — all user data stored in `localStorage`, no account needed
 
@@ -29,7 +29,7 @@ A Wikipedia rabbit-hole explorer disguised as a swipe game. Type any topic, dive
 | Routing | React Router 7 |
 | Data | Wikipedia REST API + MediaWiki API (no auth) |
 | Storage | `localStorage` only — no backend |
-| Deploy | Netlify (drag & drop `dist/`) |
+| Deploy | Cloudflare Pages |
 
 ## Getting started
 
@@ -39,6 +39,7 @@ npm run dev       # http://localhost:5173
 npm run build     # production build → dist/
 npm run preview   # serve the build locally
 npm run lint
+npm run test      # run Vitest unit tests
 ```
 
 ## Project structure
@@ -60,11 +61,11 @@ src/
     useTheme.js             # Dark/light toggle → localStorage
   contexts/
     TrophyContext.jsx        # Trophy state + toast queue
-    LanguageContext.jsx      # EN/FR + t() translation helper
+    LanguageContext.jsx      # EN/FR/ES + t() translation helper
   data/
     trophies.js             # Trophy definitions
     dailyTopics.js          # Rotating daily topic list
-    i18n.js                 # All UI strings in EN and FR
+    i18n.js                 # All UI strings in EN, FR, and ES
 ```
 
 ## localStorage keys
@@ -76,8 +77,9 @@ src/
 | `dth-streak` | Streak count, deepest dive, total sessions |
 | `dth-trophies` | Earned trophy IDs |
 | `dth-downvotes` | Topics dismissed with 👎 |
-| `dth-lang` | Language preference |
+| `dth-lang` | Language preference (`en` / `fr` / `es`) |
 | `dth-theme` | Dark / light preference |
+| `dth-skip-transition` | Skip the earth-zoom animation |
 
 ## Hidden easter eggs
 

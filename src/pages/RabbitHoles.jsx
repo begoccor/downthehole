@@ -210,6 +210,17 @@ export default function RabbitHoles() {
         </motion.div>
       )}
 
+      {/* Contact */}
+      <p className="text-center font-body text-sm text-fg-faint mt-2 mb-8">
+        Got a question or idea?{' '}
+        <a
+          href="mailto:contact@followthehole.com"
+          className="text-fg-muted underline underline-offset-2 hover:text-fg transition-colors"
+        >
+          contact@followthehole.com
+        </a>
+      </p>
+
       {/* History list */}
       <div className="space-y-4">
         {history.map((session, i) => (

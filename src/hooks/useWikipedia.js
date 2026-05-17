@@ -51,30 +51,76 @@ export async function searchTopic(query, lang = 'en') {
   return data;
 }
 
-export async function fetchRelated(title, lang = 'en') {
-  const url =
-    `${MW(lang)}?action=query&list=search&srsearch=${encodeURIComponent(title)}&srlimit=16&format=json&origin=*`;
+export async function fetchArticleLinks(title, lang = 'en') {
+  const url = `${MW(lang)}?action=query&prop=links&titles=${encodeURIComponent(title)}&pllimit=100&plnamespace=0&format=json&origin=*`;
   try {
     const data = await safeFetch(url);
-    const hits = (data.query?.search ?? [])
-      .filter(h => {
-        if (h.title === title) return false;
-        const lower = h.title.toLowerCase();
-        return !lower.startsWith('list of') && !lower.startsWith('lists of') &&
-               !lower.startsWith('liste de') && !lower.startsWith('liste des');
-      })
-      .slice(0, 10);
+    const pages = data.query?.pages;
+    if (!pages) return [];
+
+    const page = Object.values(pages)[0];
+    const links = (page?.links ?? []).map(l => l.title);
+
+    const filtered = links.filter(t => {
+      const lower = t.toLowerCase();
+      return t !== title &&
+        !lower.startsWith('list of') && !lower.startsWith('lists of') &&
+        !lower.startsWith('liste') && !lower.startsWith('anexo:');
+    });
+
+    const candidates = filtered.sort(() => Math.random() - 0.5).slice(0, 12);
 
     const summaries = await Promise.all(
-      hits.map(h =>
-        safeFetch(`${REST(lang)}/page/summary/${encodeURIComponent(h.title)}`)
-          .catch(() => null)
+      candidates.map(t =>
+        safeFetch(`${REST(lang)}/page/summary/${encodeURIComponent(t)}`).catch(() => null)
       )
     );
-    return summaries.filter(Boolean).filter(p => !isDisambig(p) && p.extract && p.extract.length > 40);
+    return summaries
+      .filter(Boolean)
+      .filter(s => !isDisambig(s) && s.extract && s.extract.length > 40);
   } catch {
     return [];
   }
+}
+
+async function fetchWikiquote(name, lang) {
+  const qlang = ['en', 'fr', 'es'].includes(lang) ? lang : 'en';
+  try {
+    const url = `https://${qlang}.wikiquote.org/w/api.php?action=parse&page=${encodeURIComponent(name)}&prop=wikitext&section=1&format=json&origin=*`;
+    const data = await safeFetch(url);
+    const wikitext = data.parse?.wikitext?.['*'] ?? '';
+    for (const line of wikitext.split('\n')) {
+      // Match *"Quote" or *«Quote»
+      const m = line.match(/^\*+\s*(?:"([^"]{40,280})"|«([^»]{40,280})»)/);
+      if (m) return (m[1] || m[2]).trim();
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchCameo(summary, lang = 'en') {
+  if (summary.coordinates?.lat != null) {
+    const { lat, lon } = summary.coordinates;
+    return {
+      type: 'map',
+      mapUrl: `https://maps.wikimedia.org/img/osm-intl,8,${lat},${lon},400x200@2x.png`,
+      osmUrl: `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=10/${lat}/${lon}`,
+    };
+  }
+
+  const desc = (summary.description || '').toLowerCase();
+  const PERSON_SIGNALS = ['born', 'actor', 'actress', 'politician', 'author', 'writer',
+    'scientist', 'musician', 'singer', 'artist', 'philosopher', 'director', 'poet',
+    'painter', 'composer', 'architect', 'mathematician', 'physicist', 'chemist',
+    'historian', 'journalist', 'filmmaker', 'athlete', 'footballer', 'player'];
+  if (PERSON_SIGNALS.some(w => desc.includes(w))) {
+    const quote = await fetchWikiquote(summary.title, lang);
+    if (quote) return { type: 'quote', text: quote, source: summary.title };
+  }
+
+  return null;
 }
 
 export async function fetchFullIntro(title, lang = 'en') {
