@@ -12,6 +12,7 @@ import { useTrophies } from '../contexts/TrophyContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getDailyTopic } from '../data/dailyTopics';
 import OArrow from '../components/OArrow';
+import NewsletterSignup from '../components/NewsletterSignup';
 import PixelEarth from '../components/PixelEarth';
 import PixelRabbit from '../components/PixelRabbit';
 import PixelWorm from '../components/PixelWorm';
@@ -909,6 +910,8 @@ function DonePhase({ topic, chain, badge, onNewSearch }) {
         </button>
         <SocialShare chain={chain} startTopic={topic} />
       </div>
+
+      <NewsletterSignup className="w-full max-w-sm mt-6" />
 
     </motion.div>
   );

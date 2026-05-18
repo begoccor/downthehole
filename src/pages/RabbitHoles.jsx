@@ -7,6 +7,7 @@ import { useTrophies } from '../contexts/TrophyContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { TROPHIES, RARITY_STYLES } from '../data/trophies';
 import SocialShare from '../components/SocialShare';
+import NewsletterSignup from '../components/NewsletterSignup';
 
 function fmt(iso) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -209,6 +210,11 @@ export default function RabbitHoles() {
           </Link>
         </motion.div>
       )}
+
+      {/* Newsletter */}
+      <div className="mb-8">
+        <NewsletterSignup />
+      </div>
 
       {/* Contact */}
       <p className="text-center font-body text-sm text-fg-faint mt-2 mb-8">
