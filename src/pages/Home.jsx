@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, Fragment } from 'react';
 import {
   motion, AnimatePresence,
   useMotionValue, useTransform,
 } from 'framer-motion';
-import { searchTopic, fetchArticleLinks, fetchCameo, fetchFullIntro, fetchArticleImages, extractFacts, searchSuggestions } from '../hooks/useWikipedia';
+import { searchTopic, fetchRelated, fetchCameo, fetchFullIntro, fetchArticleImages, extractFacts, searchSuggestions } from '../hooks/useWikipedia';
 import SocialShare from '../components/SocialShare';
 import { useDownvotes } from '../hooks/useDownvotes';
 import { useHistory } from '../hooks/useHistory';
@@ -73,7 +73,7 @@ const STAR_DATA = [
   { top: '72%', left: '51%', delay: 2.6, dur: 8,  size: '0.8rem' },
 ];
 
-function Stars() {
+const Stars = memo(function Stars() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
       {STAR_DATA.map((s, i) => (
@@ -89,10 +89,10 @@ function Stars() {
       ))}
     </div>
   );
-}
+});
 
 // ─── Earth with ambient glow ──────────────────────────────────────────────────
-function EarthWithGlow({ size = 200 }) {
+const EarthWithGlow = memo(function EarthWithGlow({ size = 200 }) {
   return (
     <div className="relative flex items-center justify-center">
       <div
@@ -113,7 +113,7 @@ function EarthWithGlow({ size = 200 }) {
       </motion.div>
     </div>
   );
-}
+});
 
 // ─── Dimension easter egg (50 hops) ──────────────────────────────────────────
 function DimensionPhase({ onContinue }) {
@@ -461,21 +461,11 @@ const DETAIL_LEVELS = [
 ];
 
 // ─── Phase 4: Facts ───────────────────────────────────────────────────────────
-function FactsPhase({ topicData, facts, cameo, onNext, onNewSearch, liked, onLike }) {
+function FactsPhase({ topicData, facts, cameo, onNext, onNewSearch, liked, onLike, images, loadingImages }) {
   const { lang, t } = useLanguage();
   const [detailLevel, setDetailLevel] = useState('some');
-  const [fullIntro, setFullIntro]     = useState(null);  // null=unfetched, ''=empty
+  const [fullIntro, setFullIntro]     = useState(null);
   const [loadingIntro, setLoadingIntro] = useState(false);
-  const [images, setImages]           = useState([]);
-  const [loadingImages, setLoadingImages] = useState(true);
-
-  useEffect(() => {
-    setLoadingImages(true);
-    setImages([]);
-    fetchArticleImages(topicData.title, lang)
-      .then(imgs => { setImages(imgs); setLoadingImages(false); })
-      .catch(() => { setImages([]); setLoadingImages(false); });
-  }, [topicData.title, lang]);
 
   // Lazy-fetch the full Wikipedia intro only when the user picks "I want to learn"
   useEffect(() => {
@@ -713,8 +703,87 @@ function FactsPhase({ topicData, facts, cameo, onNext, onNewSearch, liked, onLik
   );
 }
 
+// ─── Trail strip ─────────────────────────────────────────────────────────────
+const TrailStrip = memo(function TrailStrip({ chain, onBranch }) {
+  const [confirmIdx, setConfirmIdx] = useState(null);
+
+  if (chain.length < 2) return null;
+
+  const visible    = chain.slice(-3);
+  const hasMore    = chain.length > 3;
+  const startAbsIdx = chain.length - visible.length;
+
+  return (
+    <div className="flex items-center justify-center gap-1 mb-3 px-2"
+      onClick={e => { if (e.target === e.currentTarget) setConfirmIdx(null); }}>
+      {hasMore && (
+        <span className="font-body text-[10px] text-white/30 select-none mr-0.5">•••</span>
+      )}
+      {visible.map((topic, i) => {
+        const absIdx      = startAbsIdx + i;
+        const isCurrent   = i === visible.length - 1;
+        const age         = visible.length - 1 - i; // 0=current, 1=prev, 2=oldest
+        const isConfirming = confirmIdx === absIdx;
+        const label       = topic.length > 14 ? topic.slice(0, 13) + '…' : topic;
+
+        return (
+          <Fragment key={absIdx}>
+            {i > 0 && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: age === 0 ? 0.45 : age === 1 ? 0.28 : 0.16 }}
+                transition={{ delay: 0.05 * i }}
+                className="text-white text-[9px] select-none shrink-0"
+              >↘</motion.span>
+            )}
+            <div className="relative shrink-0">
+              <motion.button
+                initial={{ opacity: 0, y: -8 }}
+                animate={{
+                  opacity: isCurrent ? 1 : age === 1 ? 0.65 : 0.38,
+                  y: 0,
+                  scale: isCurrent ? 1 : age === 1 ? 0.95 : 0.88,
+                }}
+                transition={{ delay: 0.06 * i, duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+                whileTap={isCurrent ? {} : { scale: 1.12 }}
+                disabled={isCurrent}
+                onClick={() => !isCurrent && setConfirmIdx(isConfirming ? null : absIdx)}
+                className={`font-body text-[11px] font-bold px-2.5 py-1 rounded-full border-2 border-black shadow-[2px_2px_0_#111] select-none ${
+                  isCurrent
+                    ? 'bg-[#F7C948] text-black cursor-default'
+                    : isConfirming
+                    ? 'bg-white border-[#E8432D] text-black'
+                    : 'bg-white text-black'
+                }`}
+              >
+                {label}
+              </motion.button>
+
+              <AnimatePresence>
+                {isConfirming && (
+                  <motion.button
+                    key="confirm"
+                    initial={{ opacity: 0, y: -6, scale: 0.85 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.85 }}
+                    transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
+                    onClick={() => { onBranch(topic); setConfirmIdx(null); }}
+                    className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 font-body text-[11px] font-bold px-3 py-1 bg-[#E8432D] text-white border-2 border-black rounded-full shadow-[2px_2px_0_#111] whitespace-nowrap z-20"
+                  >
+                    ↩ branch here
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
+          </Fragment>
+        );
+      })}
+    </div>
+  );
+});
+
 // ─── Phase 5: Swipe card ──────────────────────────────────────────────────────
-function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft, onNewSearch, onDownvote }) {
+function SwipeCard({ topic, topicIndex, total, depth, chain, onBranch, onSwipeRight, onSwipeLeft, onNewSearch, onDownvote }) {
   const { t } = useLanguage();
   const x = useMotionValue(0);
   const rotate    = useTransform(x, [-220, 220], [-14, 14]);
@@ -802,6 +871,8 @@ function SwipeCard({ topic, topicIndex, total, depth, onSwipeRight, onSwipeLeft,
         <span className="text-xs opacity-75">·</span>
         <span className="text-xs opacity-90">{layerLabel}</span>
       </motion.div>
+
+      <TrailStrip chain={chain} onBranch={onBranch} />
 
       <p className="font-display text-xl text-white mb-1">{t('related_card')}</p>
       <p className="font-body text-sm text-white/65 mb-5 tracking-wide">
@@ -928,6 +999,9 @@ export default function Home() {
   const [sharedTrail, setSharedTrail]   = useState(null);
   const [suggestions, setSuggestions]   = useState([]);
   const [cameo, setCameo]               = useState(null);
+  const [images, setImages]             = useState([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [chain, setChain]               = useState([]);
 
   const { startSession, addToChain, isLiked, toggleLike, likedTopics } = useHistory();
   const { recordDive, recordDepth }                                      = useStreak();
@@ -980,9 +1054,17 @@ export default function Home() {
       if (searchId !== searchIdRef.current) return;
       seenRef.current.add(data.title.toLowerCase());
 
+      // Start image fetch immediately — runs in parallel with related fetch,
+      // and results arrive before the user finishes the transition animation
+      setLoadingImages(true);
+      setImages([]);
+      fetchArticleImages(data.title, lang)
+        .then(imgs => { if (searchId === searchIdRef.current) { setImages(imgs); setLoadingImages(false); } })
+        .catch(() => { if (searchId === searchIdRef.current) setLoadingImages(false); });
+
       const [f, allRel] = await Promise.all([
         Promise.resolve(extractFacts(data.extract)),
-        fetchArticleLinks(data.title, lang),
+        fetchRelated(data.title, lang),
       ]);
 
       // Fire cameo fetch async — doesn't block phase transition
@@ -1009,6 +1091,7 @@ export default function Home() {
         recordDive();
         awardTrophy('first_dive');
       }
+      setChain([...chainRef.current]);
 
       const depth = chainRef.current.length;
       if (depth >= 5)  awardTrophy('hop_5');
@@ -1066,6 +1149,9 @@ export default function Home() {
     setRelIdx(0);
     setError(null);
     setCameo(null);
+    setImages([]);
+    setLoadingImages(false);
+    setChain([]);
     sessionRef.current = null;
   };
   resetRef.current = reset;
@@ -1126,12 +1212,14 @@ export default function Home() {
             onLike={() => toggleLike(topicData.title)}
             onNext={() => related.length ? setPhase('related') : goToDone()}
             onNewSearch={reset}
+            images={images} loadingImages={loadingImages}
           />
         )}
         {phase === 'related' && related[relIdx] && (
           <SwipeCard key={`rel-${relIdx}`}
             topic={related[relIdx]} topicIndex={relIdx} total={related.length}
             depth={chainRef.current.length}
+            chain={chain} onBranch={topic => runSearch(topic, false)}
             onSwipeRight={swipeRight} onSwipeLeft={swipeLeft} onNewSearch={reset}
             onDownvote={downvote}
           />

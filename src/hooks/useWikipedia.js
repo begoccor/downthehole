@@ -51,33 +51,38 @@ export async function searchTopic(query, lang = 'en') {
   return data;
 }
 
-export async function fetchArticleLinks(title, lang = 'en') {
-  const url = `${MW(lang)}?action=query&prop=links&titles=${encodeURIComponent(title)}&pllimit=100&plnamespace=0&format=json&origin=*`;
+export async function fetchRelated(title, lang = 'en') {
+  // Fast path: REST related endpoint (1 request)
   try {
-    const data = await safeFetch(url);
-    const pages = data.query?.pages;
-    if (!pages) return [];
+    const data = await safeFetch(`${REST(lang)}/page/related/${encodeURIComponent(title)}`);
+    const pages = (data.pages ?? [])
+      .filter(p => !isDisambig(p) && p.extract && p.extract.length > 40);
+    if (pages.length >= 4) return pages;
+  } catch {
+    // fall through to links-based fallback
+  }
 
-    const page = Object.values(pages)[0];
-    const links = (page?.links ?? []).map(l => l.title);
-
-    const filtered = links.filter(t => {
-      const lower = t.toLowerCase();
-      return t !== title &&
-        !lower.startsWith('list of') && !lower.startsWith('lists of') &&
-        !lower.startsWith('liste') && !lower.startsWith('anexo:');
-    });
-
-    const candidates = filtered.sort(() => Math.random() - 0.5).slice(0, 12);
-
+  // Fallback: article links + summaries (6 candidates instead of the old 12)
+  try {
+    const linksData = await safeFetch(
+      `${MW(lang)}?action=query&prop=links&titles=${encodeURIComponent(title)}&pllimit=100&plnamespace=0&format=json&origin=*`
+    );
+    const page = Object.values(linksData.query?.pages ?? {})[0];
+    const links = (page?.links ?? [])
+      .map(l => l.title)
+      .filter(t => {
+        const lower = t.toLowerCase();
+        return t !== title &&
+          !lower.startsWith('list of') && !lower.startsWith('lists of') &&
+          !lower.startsWith('liste') && !lower.startsWith('anexo:');
+      });
+    const candidates = links.sort(() => Math.random() - 0.5).slice(0, 6);
     const summaries = await Promise.all(
       candidates.map(t =>
         safeFetch(`${REST(lang)}/page/summary/${encodeURIComponent(t)}`).catch(() => null)
       )
     );
-    return summaries
-      .filter(Boolean)
-      .filter(s => !isDisambig(s) && s.extract && s.extract.length > 40);
+    return summaries.filter(Boolean).filter(s => !isDisambig(s) && s.extract && s.extract.length > 40);
   } catch {
     return [];
   }
@@ -169,7 +174,7 @@ export async function fetchArticleImages(title, lang = 'en') {
 export function extractFacts(text) {
   if (!text) return [];
   return text
-    .replace(/\([^)]{0,80}\)/g, '')
+    .replace(/\([^)]{0,200}\)/g, '')
     .replace(/\s{2,}/g, ' ')
     .split(/[.!]\s+/)
     .map(s => s.trim())

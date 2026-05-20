@@ -1,0 +1,21 @@
+{
+  "name": "Follow The Hole",
+  "short_name": "Follow The Hole",
+  "description": "Fall in. Come out smarter.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7C948",
+  "theme_color": "#F7C948",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

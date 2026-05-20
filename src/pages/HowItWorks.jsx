@@ -48,6 +48,35 @@ export default function HowItWorks() {
         ))}
       </div>
 
+      {/* Add to Home Screen */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="mb-10"
+      >
+        <h2 className="font-display text-3xl text-fg mb-1">{t('homescreen_title')}</h2>
+        <p className="font-body text-base text-fg-muted mb-4">{t('homescreen_sub')}</p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {[
+            { titleKey: 'homescreen_ios_title', steps: ['homescreen_ios_1','homescreen_ios_2','homescreen_ios_3','homescreen_ios_4'] },
+            { titleKey: 'homescreen_android_title', steps: ['homescreen_android_1','homescreen_android_2','homescreen_android_3','homescreen_android_4'] },
+          ].map(({ titleKey, steps }) => (
+            <div key={titleKey} className="card shadow-[6px_6px_0_#111] p-5">
+              <p className="font-display text-xl text-[#E8432D] mb-3">{t(titleKey)}</p>
+              <ol className="space-y-1.5">
+                {steps.map((key, i) => (
+                  <li key={key} className="font-body text-sm text-black/70 flex gap-2">
+                    <span className="font-display text-[#E8432D] shrink-0">{i + 1}.</span>
+                    {t(key)}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
       {/* CTA */}
       <motion.div
         initial={{ opacity: 0 }}

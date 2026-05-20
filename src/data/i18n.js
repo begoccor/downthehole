@@ -108,6 +108,20 @@ export const EN = {
   step_3_title: 'Follow the rabbit',
   step_3_desc:  "You started with jazz and ended up reading about quantum physics. That's the whole point.",
 
+  // Add to Home Screen section
+  homescreen_title: 'Add to your home screen',
+  homescreen_sub:   'Use it like an app — no install needed.',
+  homescreen_ios_title:   '🍎 iPhone / iPad',
+  homescreen_ios_1:       'Open the site in Safari',
+  homescreen_ios_2:       'Tap the Share button (square with arrow)',
+  homescreen_ios_3:       'Tap "Add to Home Screen"',
+  homescreen_ios_4:       'Tap Add — done!',
+  homescreen_android_title: '🤖 Android',
+  homescreen_android_1:   'Open the site in Chrome',
+  homescreen_android_2:   'Tap the menu (⋮) in the top-right corner',
+  homescreen_android_3:   'Tap "Add to Home screen"',
+  homescreen_android_4:   'Tap Add — done!',
+
   // Trophy toast header
   toast_label: '🏆 Trophy unlocked',
 
@@ -284,6 +298,20 @@ export const ES = {
   step_3_title: 'Sigue el conejo',
   step_3_desc:  'Empezaste con jazz y acabaste leyendo sobre física cuántica. Ese es todo el punto.',
 
+  // Add to Home Screen section
+  homescreen_title: 'Añadir a tu pantalla de inicio',
+  homescreen_sub:   'Úsala como una app — sin instalación.',
+  homescreen_ios_title:   '🍎 iPhone / iPad',
+  homescreen_ios_1:       'Abre el sitio en Safari',
+  homescreen_ios_2:       'Toca el botón Compartir (cuadrado con flecha)',
+  homescreen_ios_3:       'Toca "Añadir a pantalla de inicio"',
+  homescreen_ios_4:       '¡Toca Añadir — listo!',
+  homescreen_android_title: '🤖 Android',
+  homescreen_android_1:   'Abre el sitio en Chrome',
+  homescreen_android_2:   'Toca el menú (⋮) en la esquina superior derecha',
+  homescreen_android_3:   'Toca "Añadir a pantalla de inicio"',
+  homescreen_android_4:   '¡Toca Añadir — listo!',
+
   // Trophy toast header
   toast_label: '🏆 Trofeo desbloqueado',
 
@@ -459,6 +487,20 @@ export const FR = {
   step_3_label: 'Étape 4',
   step_3_title: 'Suis le lapin',
   step_3_desc:  "Tu as commencé avec le jazz et tu te retrouves à lire sur la physique quantique. C'est tout l'intérêt.",
+
+  // Add to Home Screen section
+  homescreen_title: 'Ajouter à ton écran d\'accueil',
+  homescreen_sub:   'Utilise-le comme une app — sans installation.',
+  homescreen_ios_title:   '🍎 iPhone / iPad',
+  homescreen_ios_1:       'Ouvre le site dans Safari',
+  homescreen_ios_2:       'Appuie sur le bouton Partager (carré avec flèche)',
+  homescreen_ios_3:       'Appuie sur "Sur l\'écran d\'accueil"',
+  homescreen_ios_4:       'Appuie sur Ajouter — c\'est fait !',
+  homescreen_android_title: '🤖 Android',
+  homescreen_android_1:   'Ouvre le site dans Chrome',
+  homescreen_android_2:   'Appuie sur le menu (⋮) en haut à droite',
+  homescreen_android_3:   'Appuie sur "Ajouter à l\'écran d\'accueil"',
+  homescreen_android_4:   'Appuie sur Ajouter — c\'est fait !',
 
   // Trophy toast header
   toast_label: '🏆 Trophée débloqué',
