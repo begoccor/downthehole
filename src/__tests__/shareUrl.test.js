@@ -1,10 +1,24 @@
 import { describe, it, expect } from 'vitest';
+import { EN } from '../data/i18n.js';
 
 const SITE = 'https://www.followthehole.com';
 
 function buildShareUrl(chain) {
   const encoded = chain.map(encodeURIComponent).join('|');
   return `${SITE}/?trail=${encoded}`;
+}
+
+function t(key, vars = {}) {
+  let str = EN[key] ?? key;
+  for (const [k, v] of Object.entries(vars)) str = str.replaceAll(`{${k}}`, v);
+  return str;
+}
+
+function parseTrail(raw) {
+  return raw.split('|')
+    .map(s => { try { return decodeURIComponent(s); } catch { return ''; } })
+    .filter(Boolean)
+    .map(s => s.slice(0, 150));
 }
 
 describe('buildShareUrl', () => {
@@ -37,15 +51,62 @@ describe('buildShareUrl', () => {
 });
 
 describe('Facebook share URL', () => {
-  it('includes quote parameter with share text', () => {
+  it('includes sharer.php and trail URL', () => {
     const shareUrl = buildShareUrl(['Octopus', 'Cephalopod']);
-    const shareText = 'I went 2 hops deep: Octopus → Cephalopod 🕳️ Follow The Hole';
-    const fbQuote = `${shareText}\n\n🌍 ${SITE}`;
-    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(fbQuote)}`;
-
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
     expect(fbUrl).toContain('sharer.php');
     expect(fbUrl).toContain(encodeURIComponent(SITE));
-    expect(fbUrl).toContain('quote=');
-    expect(fbUrl).toContain(encodeURIComponent(SITE)); // site link in quote
+  });
+});
+
+describe('Daily share text', () => {
+  it('includes topic and hop count', () => {
+    const text = t('share_text_daily', { n: 7, topic: 'Octopus' });
+    expect(text).toContain('Octopus');
+    expect(text).toContain('7');
+  });
+
+  it('includes followthehole.com', () => {
+    const text = t('share_text_daily', { n: 3, topic: 'Jazz' });
+    expect(text).toContain('followthehole.com');
+  });
+});
+
+describe('Challenge share text', () => {
+  it('includes hop count', () => {
+    const text = t('share_text_challenge', { n: 5 });
+    expect(text).toContain('5');
+  });
+
+  it('includes followthehole.com', () => {
+    const text = t('share_text_challenge', { n: 4 });
+    expect(text).toContain('followthehole.com');
+  });
+});
+
+describe('Trail parsing (challenge URL)', () => {
+  it('decodes a pipe-separated trail', () => {
+    const raw = buildShareUrl(['Jazz', 'Miles Davis', 'Cuba']).split('?trail=')[1];
+    const trail = parseTrail(raw);
+    expect(trail).toEqual(['Jazz', 'Miles Davis', 'Cuba']);
+  });
+
+  it('triggers challenge mode for trails with 2+ topics', () => {
+    const raw = buildShareUrl(['Jazz', 'Miles Davis']).split('?trail=')[1];
+    const trail = parseTrail(raw);
+    expect(trail.length >= 2).toBe(true);
+  });
+
+  it('does not trigger challenge mode for single-topic trails', () => {
+    const raw = buildShareUrl(['Jazz']).split('?trail=')[1];
+    const trail = parseTrail(raw);
+    expect(trail.length < 2).toBe(true);
+  });
+
+  it('strips topics longer than 150 chars', () => {
+    const long = 'a'.repeat(200);
+    const raw  = encodeURIComponent(long);
+    const trail = parseTrail(raw);
+    expect(trail[0].length).toBeLessThanOrEqual(150);
   });
 });

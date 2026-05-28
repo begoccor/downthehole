@@ -191,6 +191,124 @@ function DimensionPhase({ onContinue }) {
   );
 }
 
+// ─── Challenge phase ──────────────────────────────────────────────────────────
+function ChallengePhase({ trail, onAccept, onContinue, onDecline }) {
+  const { t } = useLanguage();
+  const startTopic = trail[0];
+  const lastTopic  = trail[trail.length - 1];
+  const n          = trail.length;
+  const hopWord    = n === 1 ? t('hop') : t('hops');
+
+  // Collapse long trails for display: show first 2, ···, last 2
+  const displayTrail = trail.length > 5
+    ? [trail[0], trail[1], '···', trail[trail.length - 2], trail[trail.length - 1]]
+    : trail;
+
+  return (
+    <motion.div
+      key="challenge"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }}
+      className="relative flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] px-6 py-10"
+    >
+      <Stars />
+
+      <div className="z-10 w-full max-w-md mx-auto flex flex-col items-center gap-6">
+        {/* Header */}
+        <div className="text-center">
+          <motion.p
+            initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+            className="font-body text-xs text-fg-faint uppercase tracking-widest mb-2"
+          >
+            🎯 {t('challenge_heading')}
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="inline-flex items-center gap-2 px-5 py-2 bg-[#F7C948] border-4 border-black rounded-full shadow-[4px_4px_0_#111] mb-3"
+          >
+            <span className="font-display text-3xl text-black">{n}</span>
+            <span className="font-body text-sm font-bold text-black/70">{hopWord}</span>
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+            className="font-body text-base text-fg-muted"
+          >
+            {t('challenge_sub', { n, start: startTopic })}
+            <br />
+            <span className="font-body font-bold text-fg">{t('challenge_sub2')}</span>
+          </motion.p>
+        </div>
+
+        {/* Trail card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="w-full card shadow-[6px_6px_0_#111] p-4"
+        >
+          <p className="font-body text-[10px] uppercase tracking-widest text-black/40 mb-3">
+            {t('challenge_trail_lbl')}
+          </p>
+          <div className="flex flex-wrap gap-2 items-center">
+            {displayTrail.map((topic, i) => {
+              const isEllipsis = topic === '···';
+              const isFirst    = i === 0;
+              const isLast     = i === displayTrail.length - 1;
+              return (
+                <span key={i} className="flex items-center gap-2">
+                  {isEllipsis ? (
+                    <span className="font-body text-sm text-black/40 px-1">···</span>
+                  ) : (
+                    <span className={`font-body text-sm border-2 border-black rounded-full px-3 py-1 font-semibold ${
+                      isFirst ? 'bg-[#F7C948] text-black'
+                      : isLast  ? 'bg-[#E8432D] text-white'
+                      : 'bg-white text-black'
+                    }`}>
+                      {topic.length > 22 ? topic.slice(0, 21) + '…' : topic}
+                    </span>
+                  )}
+                  {i < displayTrail.length - 1 && !isEllipsis && displayTrail[i + 1] !== '···' && (
+                    <span className="text-black/30 font-bold text-xs">→</span>
+                  )}
+                  {displayTrail[i + 1] === '···' && (
+                    <span className="text-black/30 font-bold text-xs">→</span>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="w-full flex flex-col gap-3"
+        >
+          <button
+            onClick={onAccept}
+            className="w-full py-4 bg-[#E8432D] text-white font-display text-xl border-4 border-black rounded-2xl shadow-[6px_6px_0_#111] btn-press"
+          >
+            {t('challenge_accept', { topic: startTopic })}
+          </button>
+          {lastTopic !== startTopic && (
+            <button
+              onClick={onContinue}
+              className="w-full py-3 font-display text-base text-black card shadow-[3px_3px_0_#111] btn-press"
+            >
+              {t('challenge_continue', { topic: lastTopic })}
+            </button>
+          )}
+          <button
+            onClick={onDecline}
+            className="font-body text-sm text-fg-faint hover:text-fg transition-colors text-center underline"
+          >
+            {t('challenge_decline')}
+          </button>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Phase 1: Input ───────────────────────────────────────────────────────────
 const GRAIN_URL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E";
 
@@ -947,8 +1065,9 @@ function SwipeCard({ topic, topicIndex, total, depth, chain, onBranch, onSwipeRi
 }
 
 // ─── Phase 6: Done ────────────────────────────────────────────────────────────
-function DonePhase({ topic, chain, badge, onNewSearch }) {
+function DonePhase({ topic, chain, badge, onNewSearch, isDailySession, challengeOriginalDepth }) {
   const { t } = useLanguage();
+  const n = chain.length;
 
   return (
     <motion.div
@@ -956,7 +1075,48 @@ function DonePhase({ topic, chain, badge, onNewSearch }) {
       className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] px-4 text-center"
     >
       <div className="mb-5"><PixelRabbit width={100} /></div>
-      {badge && (
+
+      {/* Daily challenge complete banner */}
+      {isDailySession && (
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.1, type: 'spring', bounce: 0.35 }}
+          className="mb-4 w-full max-w-xs card border-4 border-[#F7C948] shadow-[4px_4px_0_#111] p-4 text-center"
+        >
+          <p className="font-body text-[10px] uppercase tracking-widest text-black/50 mb-1">{t('daily_done_lbl')}</p>
+          <p className="font-display text-2xl text-[#E8432D]">{t('daily_done_title', { n })}</p>
+          <p className="font-body text-xs text-black/50 mt-1">{t('daily_done_sub')}</p>
+        </motion.div>
+      )}
+
+      {/* Challenge result banner */}
+      {challengeOriginalDepth != null && (
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: isDailySession ? 0.2 : 0.1, type: 'spring', bounce: 0.35 }}
+          className="mb-4 w-full max-w-xs card border-4 border-black/10 shadow-[4px_4px_0_#111] p-4"
+        >
+          <p className="font-body text-[10px] uppercase tracking-widest text-black/50 mb-3">{t('challenge_result_lbl')}</p>
+          <div className="flex gap-4 justify-center items-end mb-3">
+            <div className="text-center">
+              <p className="font-body text-[10px] text-black/50 mb-0.5">{t('challenge_their')}</p>
+              <p className="font-display text-4xl text-black/35">{challengeOriginalDepth}</p>
+            </div>
+            <p className="font-body text-sm text-black/25 mb-2">vs</p>
+            <div className="text-center">
+              <p className="font-body text-[10px] text-black/50 mb-0.5">{t('challenge_yours')}</p>
+              <p className={`font-display text-4xl ${n >= challengeOriginalDepth ? 'text-[#E8432D]' : 'text-black/70'}`}>{n}</p>
+            </div>
+          </div>
+          <p className="font-display text-base text-center">
+            {n > challengeOriginalDepth ? t('challenge_won')
+              : n === challengeOriginalDepth ? t('challenge_tied')
+              : t('challenge_lost')}
+          </p>
+        </motion.div>
+      )}
+
+      {badge && !isDailySession && challengeOriginalDepth == null && (
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring', bounce: 0.4 }}
@@ -965,10 +1125,11 @@ function DonePhase({ topic, chain, badge, onNewSearch }) {
           <span className="text-xl">{badge.emoji}</span>
           <span className="font-display text-base text-black">{t(badge.key)}</span>
           <span className="font-body text-xs text-black/60">
-            · {chain.length} {chain.length === 1 ? t('hop') : t('hops')}
+            · {n} {n === 1 ? t('hop') : t('hops')}
           </span>
         </motion.div>
       )}
+
       <h2 className="font-display text-4xl text-fg mb-3">{t('explored_all')}</h2>
       <p className="font-body text-lg text-fg-muted mb-8 max-w-xs">
         {t('no_more', { topic })}
@@ -979,7 +1140,9 @@ function DonePhase({ topic, chain, badge, onNewSearch }) {
         >
           {t('new_hole')}
         </button>
-        <SocialShare chain={chain} startTopic={topic} />
+        <SocialShare chain={chain} startTopic={topic}
+          isDailySession={isDailySession}
+          challengeOriginalDepth={challengeOriginalDepth} />
       </div>
 
       <NewsletterSignup className="w-full max-w-sm mt-6" />
@@ -1002,6 +1165,8 @@ export default function Home() {
   const [images, setImages]             = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
   const [chain, setChain]               = useState([]);
+  const [isDailySession, setIsDailySession]           = useState(false);
+  const [challengeOriginalDepth, setChallengeOriginalDepth] = useState(null);
 
   const { startSession, addToChain, isLiked, toggleLike, likedTopics } = useHistory();
   const { recordDive, recordDepth }                                      = useStreak();
@@ -1025,7 +1190,13 @@ export default function Home() {
         .map(s => { try { return decodeURIComponent(s); } catch { return ''; } })
         .filter(Boolean)
         .map(s => s.slice(0, 150));
-      if (trail.length > 0) setSharedTrail(trail);
+      if (trail.length >= 2) {
+        // Enough hops to show the challenge screen
+        setSharedTrail(trail);
+        setPhase('challenge');
+      } else if (trail.length === 1) {
+        setSharedTrail(trail);
+      }
     }
     const q = params.get('q');
     if (q) {
@@ -1090,6 +1261,9 @@ export default function Home() {
         chainRef.current   = [data.title];
         recordDive();
         awardTrophy('first_dive');
+        // Track if this fresh session started from today's daily topic
+        const daily = getDailyTopic(lang);
+        setIsDailySession(query.trim().toLowerCase() === daily.toLowerCase());
       }
       setChain([...chainRef.current]);
 
@@ -1152,6 +1326,9 @@ export default function Home() {
     setImages([]);
     setLoadingImages(false);
     setChain([]);
+    setSharedTrail(null);
+    setIsDailySession(false);
+    setChallengeOriginalDepth(null);
     sessionRef.current = null;
   };
   resetRef.current = reset;
@@ -1195,10 +1372,34 @@ export default function Home() {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
+        {phase === 'challenge' && sharedTrail && (
+          <ChallengePhase
+            key="challenge"
+            trail={sharedTrail}
+            onAccept={() => {
+              const depth = sharedTrail.length;
+              const topic = sharedTrail[0];
+              setChallengeOriginalDepth(depth);
+              setSharedTrail(null);
+              runSearch(topic);
+            }}
+            onContinue={() => {
+              const topic = sharedTrail[sharedTrail.length - 1];
+              setSharedTrail(null);
+              setPhase('input');
+              runSearch(topic);
+            }}
+            onDecline={() => {
+              setSharedTrail(null);
+              setPhase('input');
+            }}
+          />
+        )}
         {phase === 'input' && (
           <InputPhase key="input" onSearch={q => runSearch(q)} error={error}
             suggestions={suggestions}
-            sharedTrail={sharedTrail} likedTopics={likedTopics} />
+            sharedTrail={sharedTrail?.length === 1 ? sharedTrail : null}
+            likedTopics={likedTopics} />
         )}
         {phase === 'loading'    && <LoadingPhase key="loading" />}
         {phase === 'dimension'  && <DimensionPhase key="dimension" onContinue={handleDimensionContinue} />}
@@ -1227,6 +1428,8 @@ export default function Home() {
         {phase === 'done' && (
           <DonePhase key="done" topic={topicData?.title}
             chain={chainRef.current} badge={badge} onNewSearch={reset}
+            isDailySession={isDailySession}
+            challengeOriginalDepth={challengeOriginalDepth}
           />
         )}
       </AnimatePresence>

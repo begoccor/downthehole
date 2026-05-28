@@ -186,6 +186,30 @@ export const EN = {
   share_copied:      '✓ Copied!',
   share_text_multi:  'I went {n} hops deep: {trail} 🕳️ Down The Hole',
   share_text_single: 'I explored {topic} on Down The Hole 🐰',
+  share_text_daily:     "Today's {topic}: I went {n} hops deep! Can you beat me? 🌅 followthehole.com",
+  share_text_challenge: 'I answered the challenge: {n} hops deep! Can you top it? 🕳️ followthehole.com',
+
+  // Challenge phase
+  challenge_heading:   'A challenge awaits',
+  challenge_sub:       'They went {n} hops deep from {start}',
+  challenge_sub2:      'Can you go further?',
+  challenge_accept:    'Start from {topic} →',
+  challenge_continue:  'Continue from {topic} →',
+  challenge_decline:   'Start fresh instead',
+  challenge_trail_lbl: 'Their trail:',
+
+  // Challenge result (DonePhase)
+  challenge_result_lbl: '🎯 Challenge',
+  challenge_their:      'Their depth',
+  challenge_yours:      'Your depth',
+  challenge_won:        'You went deeper! 🏆',
+  challenge_tied:       "It's a tie! 🤝",
+  challenge_lost:       'Challenge them back! 🔄',
+
+  // Daily complete (DonePhase)
+  daily_done_lbl:   '🌅 Daily Challenge',
+  daily_done_title: 'Done! {n} hops deep',
+  daily_done_sub:   'Share and see how your friends do',
 };
 
 export const ES = {
@@ -376,6 +400,30 @@ export const ES = {
   share_copied:      '✓ ¡Copiado!',
   share_text_multi:  'Hice {n} saltos: {trail} 🕳️ Down The Hole',
   share_text_single: 'Exploré {topic} en Down The Hole 🐰',
+  share_text_daily:     'El {topic} de hoy: ¡{n} saltos! ¿Puedes superarme? 🌅 followthehole.com',
+  share_text_challenge: 'Acepté el desafío: ¡{n} saltos! ¿Puedes hacerlo mejor? 🕳️ followthehole.com',
+
+  // Challenge phase
+  challenge_heading:   'Un desafío te espera',
+  challenge_sub:       'Llegaron a {n} saltos desde {start}',
+  challenge_sub2:      '¿Puedes ir más lejos?',
+  challenge_accept:    'Empezar desde {topic} →',
+  challenge_continue:  'Continuar desde {topic} →',
+  challenge_decline:   'Empezar desde cero',
+  challenge_trail_lbl: 'Su recorrido:',
+
+  // Challenge result (DonePhase)
+  challenge_result_lbl: '🎯 Desafío',
+  challenge_their:      'Su profundidad',
+  challenge_yours:      'Tu profundidad',
+  challenge_won:        '¡Fuiste más lejos! 🏆',
+  challenge_tied:       '¡Empate! 🤝',
+  challenge_lost:       '¡Desafíalos de vuelta! 🔄',
+
+  // Daily complete (DonePhase)
+  daily_done_lbl:   '🌅 Desafío diario',
+  daily_done_title: '¡Hecho! {n} saltos',
+  daily_done_sub:   'Comparte y ve cómo les va a tus amigos',
 };
 
 export const FR = {
@@ -566,4 +614,28 @@ export const FR = {
   share_copied:      '✓ Copié !',
   share_text_multi:  'J\'ai fait {n} sauts : {trail} 🕳️ Down The Hole',
   share_text_single: 'J\'ai exploré {topic} sur Down The Hole 🐰',
+  share_text_daily:     'Le {topic} du jour : {n} sauts ! Tu peux faire mieux ? 🌅 followthehole.com',
+  share_text_challenge: 'Défi relevé : {n} sauts ! Fais mieux ! 🕳️ followthehole.com',
+
+  // Challenge phase
+  challenge_heading:   "Un défi t'attend",
+  challenge_sub:       'Quelqu\'un a fait {n} sauts depuis {start}',
+  challenge_sub2:      'Tu peux faire mieux ?',
+  challenge_accept:    'Démarrer depuis {topic} →',
+  challenge_continue:  'Continuer depuis {topic} →',
+  challenge_decline:   'Recommencer à zéro',
+  challenge_trail_lbl: 'Leur parcours :',
+
+  // Challenge result (DonePhase)
+  challenge_result_lbl: '🎯 Défi',
+  challenge_their:      'Leur profondeur',
+  challenge_yours:      'Ta profondeur',
+  challenge_won:        'Tu es allé plus loin ! 🏆',
+  challenge_tied:       'Égalité ! 🤝',
+  challenge_lost:       'Relance-les ! 🔄',
+
+  // Daily complete (DonePhase)
+  daily_done_lbl:   '🌅 Défi du jour',
+  daily_done_title: 'Fait ! {n} sauts',
+  daily_done_sub:   'Partage et vois comment tes amis s\'en sortent',
 };
