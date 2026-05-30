@@ -101,7 +101,7 @@ export default function HowItWorks() {
         transition={{ delay: 0.6 }}
         className="text-center font-body text-sm text-fg-faint mt-8"
       >
-        Got a question or idea?{' '}
+        {t('contact_line')}{' '}
         <a
           href="mailto:contact@followthehole.com"
           className="text-fg-muted underline underline-offset-2 hover:text-fg transition-colors"

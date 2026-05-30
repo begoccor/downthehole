@@ -592,6 +592,9 @@ function InputPhase({ onSearch, error, suggestions = [], sharedTrail, likedTopic
               <div className="flex-1 text-left min-w-0">
                 <p className="font-body text-[0.62rem] text-fg-faint uppercase tracking-widest leading-none mb-0.5">{t('daily_label')}</p>
                 <p className="font-display text-base text-fg truncate">{dailyTopic}</p>
+                <p className="font-body text-[0.62rem] leading-none mt-1" style={{ color: 'var(--yellow)', opacity: 0.85 }}>
+                  🎯 {t('daily_goal_label')} <strong>{DAILY_GOAL.label}</strong>
+                </p>
               </div>
               <span className="font-body text-sm text-fg-faint group-hover:text-[#F7C948] transition-colors shrink-0" aria-hidden>→</span>
             </button>

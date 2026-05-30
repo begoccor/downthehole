@@ -27,6 +27,23 @@ export function useLeaderboard() {
     } catch {}
   }, [user]);
 
+  // Sync full profile stats including longest streak and deepest dive
+  const syncFullStats = useCallback(async (streak) => {
+    if (!user) return;
+    try {
+      await supabase
+        .from('leaderboard')
+        .update({
+          daily_streak:   streak.current,
+          longest_streak: streak.longest,
+          deepest_dive:   streak.deepest,
+          total_dives:    streak.total,
+          updated_at:     new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+    } catch {}
+  }, [user]);
+
   const recordDailyWin = useCallback(async () => {
     if (!user) return;
     try {
@@ -53,7 +70,6 @@ export function useLeaderboard() {
       if (error) throw error;
       return data ?? [];
     } catch {
-      // daily_wins column may not exist yet — fall back to basic columns
       try {
         const safeOrder = orderBy === 'daily_wins' ? 'total_dives' : orderBy;
         const { data } = await supabase
@@ -68,5 +84,19 @@ export function useLeaderboard() {
     }
   }, []);
 
-  return { syncStats, recordDailyWin, fetchBoard, userId: user?.id ?? null };
+  const fetchProfile = useCallback(async () => {
+    if (!user) return null;
+    try {
+      const { data } = await supabase
+        .from('leaderboard')
+        .select('display_name, daily_streak, longest_streak, deepest_dive, total_dives, daily_wins, trophies')
+        .eq('user_id', user.id)
+        .single();
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  }, [user]);
+
+  return { syncStats, syncFullStats, recordDailyWin, fetchBoard, fetchProfile, userId: user?.id ?? null };
 }

@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useLeaderboard } from '../hooks/useLeaderboard';
-
-const TABS = [
-  { id: 'total_dives', label: '🕳️ Total Dives', unit: 'dives' },
-  { id: 'daily_wins',  label: '🏆 Daily Wins',  unit: 'wins' },
-];
+import { useLanguage } from '../contexts/LanguageContext';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
-function Row({ rank, entry, isMe }) {
+function Row({ rank, entry, isMe, youLabel }) {
   const medal = MEDALS[rank - 1];
   return (
     <motion.div
@@ -28,7 +24,7 @@ function Row({ rank, entry, isMe }) {
       </span>
       <span className={`font-body font-bold text-sm flex-1 truncate ${isMe ? 'text-black' : 'text-black/80'}`}>
         {entry.display_name}
-        {isMe && <span className="font-body font-normal text-[10px] text-black/50 ml-1">(you)</span>}
+        {isMe && <span className="font-body font-normal text-[10px] text-black/50 ml-1">{youLabel}</span>}
       </span>
       <span className={`font-display text-lg shrink-0 ${isMe ? 'text-[#E8432D]' : 'text-black/70'}`}>
         {entry.score}
@@ -40,9 +36,15 @@ function Row({ rank, entry, isMe }) {
 export default function Leaderboard() {
   const { user, openAuthModal } = useAuth();
   const { fetchBoard, userId }  = useLeaderboard();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('total_dives');
   const [rows, setRows]           = useState([]);
   const [loading, setLoading]     = useState(true);
+
+  const TABS = [
+    { id: 'total_dives', label: t('board_tab_dives'), unit: t('board_unit_dives') },
+    { id: 'daily_wins',  label: t('board_tab_wins'),  unit: t('board_unit_wins')  },
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -56,7 +58,7 @@ export default function Leaderboard() {
     });
   }, [activeTab, fetchBoard]);
 
-  const currentTab = TABS.find(t => t.id === activeTab);
+  const currentTab = TABS.find(tab => tab.id === activeTab);
 
   return (
     <div className="max-w-lg mx-auto px-4 py-10">
@@ -66,25 +68,25 @@ export default function Leaderboard() {
         className="text-center mb-8"
       >
         <h1 className="font-display text-[clamp(2.8rem,10vw,5rem)] text-fg leading-none mb-2">
-          LEADERBOARD
+          {t('board_title').toUpperCase()}
         </h1>
-        <p className="font-body text-base text-fg-muted">Who's gone the deepest?</p>
+        <p className="font-body text-base text-fg-muted">{t('board_sub')}</p>
       </motion.div>
 
       {/* Sign-in nudge */}
       {!user && (
         <motion.div
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="mb-6 card border-4 border-[#F7C948] shadow-[4px_4px_0_#111] p-4 flex items-center justify-between gap-4"
+          className="mb-6 card border-4 border-[#E8432D] shadow-[4px_4px_0_#111] p-4 flex items-center justify-between gap-4"
         >
           <p className="font-body text-sm text-black/70 flex-1">
-            Sign in to appear on the board and track your rank.
+            {t('board_signin_nudge')}
           </p>
           <button
             onClick={openAuthModal}
             className="shrink-0 px-4 py-2 bg-[#E8432D] text-white font-display text-base border-2 border-black rounded-xl shadow-[2px_2px_0_#111] btn-press"
           >
-            Sign in
+            {t('board_signin_btn')}
           </button>
         </motion.div>
       )}
@@ -116,8 +118,8 @@ export default function Leaderboard() {
       ) : rows.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-5xl mb-3">🕳️</p>
-          <p className="font-display text-2xl text-fg mb-1">No one yet</p>
-          <p className="font-body text-sm text-fg-muted">Be the first to appear!</p>
+          <p className="font-display text-2xl text-fg mb-1">{t('board_empty_title')}</p>
+          <p className="font-body text-sm text-fg-muted">{t('board_empty_sub')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -127,10 +129,14 @@ export default function Leaderboard() {
               rank={entry.rank}
               entry={entry}
               isMe={entry.user_id === userId}
+              youLabel={t('board_you')}
             />
           ))}
           <p className="font-body text-xs text-fg-faint text-center pt-2">
-            Top 50 · ranked by {currentTab.label.replace(/[🔥🕳️]\s*/, '')} · {currentTab.unit}
+            {t('board_footer', {
+              label: currentTab.label.replace(/[🕳️🏆]\s*/u, ''),
+              unit:  currentTab.unit,
+            })}
           </p>
         </div>
       )}

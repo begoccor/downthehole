@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useHistory } from '../hooks/useHistory';
 import { useStreak, getStreakBadge } from '../hooks/useStreak';
 import { useTrophies } from '../contexts/TrophyContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useLeaderboard } from '../hooks/useLeaderboard';
 import { useLanguage } from '../contexts/LanguageContext';
 import { TROPHIES, RARITY_STYLES } from '../data/trophies';
 import SocialShare from '../components/SocialShare';
@@ -18,12 +20,16 @@ function fmt(iso) {
 export default function RabbitHoles() {
   const { history, clearHistory, isLiked, likedTopics, toggleLike } = useHistory();
   const { streak, backfill } = useStreak();
-  const { earned, awardTrophy } = useTrophies();
+  const { earned, earnedDates, awardTrophy } = useTrophies();
+  const { user, openAuthModal } = useAuth();
+  const { fetchProfile, syncFullStats } = useLeaderboard();
   const { t } = useLanguage();
   const streakBadge = getStreakBadge(streak.current);
+
   const [skipAnim, setSkipAnim] = useState(
     () => localStorage.getItem('dth-skip-transition') === 'true'
   );
+  const [dbProfile, setDbProfile] = useState(null);
 
   const toggleSkipAnim = () => {
     const next = !skipAnim;
@@ -31,6 +37,7 @@ export default function RabbitHoles() {
     localStorage.setItem('dth-skip-transition', String(next));
   };
 
+  // Backfill local streak from history if missing
   useEffect(() => {
     if (streak.total === 0 && history.length > 0) {
       const deepest = Math.max(...history.map(s => s.chain.length));
@@ -38,6 +45,7 @@ export default function RabbitHoles() {
     }
   }, [history.length, streak.total, backfill]);
 
+  // Award trophies based on local stats
   useEffect(() => {
     if (streak.total >= 1)  awardTrophy('first_dive');
     if (streak.total >= 10) awardTrophy('total_10');
@@ -48,15 +56,57 @@ export default function RabbitHoles() {
     if (likedTopics.size >= 5) awardTrophy('starred_5');
   }, [streak.total, streak.current, likedTopics.size, awardTrophy]);
 
+  // Fetch profile from DB and sync full stats when signed in
+  useEffect(() => {
+    if (!user) return;
+    fetchProfile().then(data => { if (data) setDbProfile(data); });
+    syncFullStats(streak);
+  }, [user?.id]);
+
+  const displayName = dbProfile?.display_name
+    ?? user?.user_metadata?.display_name
+    ?? user?.email?.split('@')[0]
+    ?? null;
+
   const divesLabel = history.length === 1
     ? t('dives_one')
     : t('dives_many', { n: history.length });
 
+  // Stats: prefer DB values when signed in (more accurate across devices)
+  const stats = user && dbProfile ? [
+    {
+      label: t('stat_streak'),
+      value: `${dbProfile.daily_streak ?? streak.current}d`,
+      sub: streakBadge ? t(streakBadge.key) : (streak.current > 0 ? t('keep_going') : t('start_today')),
+    },
+    { label: t('stat_best'),    value: `${dbProfile.longest_streak ?? streak.longest}d`, sub: t('longest_streak') },
+    { label: t('stat_deepest'), value: `${dbProfile.deepest_dive ?? streak.deepest}`,    sub: streak.deepest !== 1 ? t('hops_p') : t('hop_s') },
+    { label: t('stat_total'),   value: dbProfile.total_dives ?? streak.total,            sub: t('dives_p') },
+  ] : [
+    {
+      label: t('stat_streak'),
+      value: `${streak.current}d`,
+      sub: streakBadge ? t(streakBadge.key) : (streak.current > 0 ? t('keep_going') : t('start_today')),
+    },
+    { label: t('stat_best'),    value: `${streak.longest}d`, sub: t('longest_streak') },
+    { label: t('stat_deepest'), value: `${streak.deepest}`,  sub: streak.deepest !== 1 ? t('hops_p') : t('hop_s') },
+    { label: t('stat_total'),   value: streak.total,          sub: t('dives_p') },
+  ];
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
+
       {/* Header */}
       <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
         <div>
+          {user && displayName && (
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-[#E8432D] border-2 border-black shadow-[2px_2px_0_#111] flex items-center justify-center font-display text-white text-lg">
+                {displayName[0].toUpperCase()}
+              </div>
+              <span className="font-display text-xl text-fg">{displayName}</span>
+            </div>
+          )}
           <h1 className="font-display text-[clamp(2.2rem,8vw,4rem)] text-fg leading-none">
             {t('your_holes')}
           </h1>
@@ -72,18 +122,29 @@ export default function RabbitHoles() {
         )}
       </div>
 
+      {/* Not signed in — sign-in prompt */}
+      {!user && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="mb-8 card shadow-[5px_5px_0_#111] p-6 flex flex-col sm:flex-row items-center gap-5"
+        >
+          <div className="text-5xl shrink-0">🔐</div>
+          <div className="flex-1 text-center sm:text-left">
+            <p className="font-display text-2xl text-black mb-1">{t('profile_signin_title')}</p>
+            <p className="font-body text-sm text-black/55">{t('profile_signin_sub')}</p>
+          </div>
+          <button
+            onClick={openAuthModal}
+            className="shrink-0 font-body font-bold text-sm px-5 py-2.5 bg-[#E8432D] text-white border-2 border-black rounded-xl shadow-[3px_3px_0_#111] btn-press"
+          >
+            {t('profile_signin_btn')}
+          </button>
+        </motion.div>
+      )}
+
       {/* Stats panel */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        {[
-          {
-            label: t('stat_streak'),
-            value: `${streak.current}d`,
-            sub: streakBadge ? t(streakBadge.key) : (streak.current > 0 ? t('keep_going') : t('start_today')),
-          },
-          { label: t('stat_best'),    value: `${streak.longest}d`, sub: t('longest_streak') },
-          { label: t('stat_deepest'), value: `${streak.deepest}`,  sub: streak.deepest !== 1 ? t('hops_p') : t('hop_s') },
-          { label: t('stat_total'),   value: streak.total,          sub: t('dives_p') },
-        ].map(({ label, value, sub }) => (
+        {stats.map(({ label, value, sub }) => (
           <div key={label} className="card shadow-[4px_4px_0_#111] p-4 text-center">
             <p className="font-body text-[10px] text-black/50 uppercase tracking-widest mb-1">{label}</p>
             <p className="font-display text-2xl text-[#E8432D]">{value}</p>
@@ -91,6 +152,17 @@ export default function RabbitHoles() {
           </div>
         ))}
       </div>
+
+      {/* Daily wins stat — only when signed in */}
+      {user && dbProfile?.daily_wins != null && (
+        <div className="card shadow-[4px_4px_0_#111] p-4 mb-8 flex items-center gap-4">
+          <span className="text-3xl">🏆</span>
+          <div>
+            <p className="font-display text-2xl text-[#E8432D]">{dbProfile.daily_wins}</p>
+            <p className="font-body text-xs text-black/50">{t('profile_daily_wins')}</p>
+          </div>
+        </div>
+      )}
 
       {/* Trophies */}
       <div className="mb-8">
@@ -104,6 +176,7 @@ export default function RabbitHoles() {
           {TROPHIES.map(trophy => {
             const isEarned = earned.has(trophy.id);
             const rs = RARITY_STYLES[trophy.rarity];
+            const earnedOn = earnedDates[trophy.id];
             return (
               <motion.div
                 key={trophy.id}
@@ -130,6 +203,9 @@ export default function RabbitHoles() {
                 <p className="font-body text-xs text-black/55 leading-snug">
                   {t(`trophy_${trophy.id}_desc`)}
                 </p>
+                {isEarned && earnedOn && (
+                  <p className="font-body text-[10px] text-black/35 mt-0.5">{fmt(earnedOn)}</p>
+                )}
               </motion.div>
             );
           })}
@@ -218,7 +294,7 @@ export default function RabbitHoles() {
 
       {/* Contact */}
       <p className="text-center font-body text-sm text-fg-faint mt-2 mb-8">
-        Got a question or idea?{' '}
+        {t('contact_line')}{' '}
         <a
           href="mailto:contact@followthehole.com"
           className="text-fg-muted underline underline-offset-2 hover:text-fg transition-colors"

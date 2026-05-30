@@ -170,7 +170,7 @@ export default function Nav() {
         style={{ borderColor: 'var(--nav-border)' }}
       >
         <div
-          style={{ display: 'flex', flexDirection: 'row', height: 56, paddingBottom: 'env(safe-area-inset-bottom)' }}
+          style={{ display: 'flex', flexDirection: 'row', paddingTop: 6, paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)' }}
         >
           {TABS.map(({ to, icon, key, label }) => {
             const active = pathname === to;

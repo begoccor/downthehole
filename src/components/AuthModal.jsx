@@ -15,7 +15,7 @@ function Field({ label, type = 'text', value, onChange, placeholder, maxLength }
         placeholder={placeholder}
         maxLength={maxLength}
         required
-        className="px-4 py-3 font-body text-sm border-4 border-black rounded-2xl bg-white text-black shadow-[4px_4px_0_#111] focus:outline-none focus:ring-2 focus:ring-[#F7C948] placeholder-black/30"
+        className="px-4 py-3 font-body text-sm border-4 border-black rounded-2xl bg-white text-black shadow-[4px_4px_0_#111] focus:outline-none focus:ring-2 focus:ring-[#E8432D] placeholder-black/30"
       />
     </div>
   );
@@ -115,9 +115,9 @@ export default function AuthModal() {
           className="w-full max-w-sm card shadow-[8px_8px_0_#111] overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-[#F7C948] border-b-4 border-black px-6 py-4 flex items-center justify-between">
-            <h2 className="font-display text-2xl text-[#0D0721]">{headerTitle}</h2>
-            <button onClick={close} className="font-body text-xl text-black/50 hover:text-black transition-colors leading-none" aria-label="Close">✕</button>
+          <div className="bg-[#0D0721] border-b-4 border-black px-6 py-4 flex items-center justify-between">
+            <h2 className="font-display text-2xl text-white">{headerTitle}</h2>
+            <button onClick={close} className="font-body text-xl text-white/50 hover:text-white transition-colors leading-none" aria-label="Close">✕</button>
           </div>
 
           {/* Tabs — hidden on reset screen */}

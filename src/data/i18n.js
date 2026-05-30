@@ -12,7 +12,8 @@ export const EN = {
   tagline:       'Fall in. Come out smarter.',
   placeholder:   'try: black holes, jazz, octopuses…',
   dive_btn:      'Dive in 🐰',
-  daily_label:   "Today's hole:",
+  daily_label:      "Today's hole:",
+  daily_goal_label: 'Goal: reach',
   starred_label: '♥ Starred holes',
   shared_trail:  '🔗 Shared trail',
   continue_from: 'Continue from {topic} →',
@@ -220,6 +221,29 @@ export const EN = {
   daily_goal_continue: 'Keep diving →',
   daily_goal_nudge:    'Sign in to track your wins →',
   share_text_daily_win: 'I reached {topic} in {n} hops from {start}! 🏆 Beat my daily challenge: followthehole.com',
+
+  // Leaderboard page
+  board_title:          'Leaderboard',
+  board_sub:            "Who's gone the deepest?",
+  board_tab_dives:      '🕳️ Total Dives',
+  board_tab_wins:       '🏆 Daily Wins',
+  board_you:            '(you)',
+  board_signin_nudge:   'Sign in to appear on the board and track your rank.',
+  board_signin_btn:     'Sign in',
+  board_empty_title:    'No one yet',
+  board_empty_sub:      'Be the first to appear!',
+  board_footer:         'Top 50 · ranked by {label} · {unit}',
+  board_unit_dives:     'dives',
+  board_unit_wins:      'wins',
+
+  // Contact line
+  contact_line:         'Got a question or idea?',
+
+  // Profile sign-in card
+  profile_signin_title: 'Save your progress',
+  profile_signin_sub:   'Sign in to sync your stats, trophies and streaks across devices and appear on the leaderboard.',
+  profile_signin_btn:   'Sign in',
+  profile_daily_wins:   'Daily challenges won',
 };
 
 export const ES = {
@@ -236,7 +260,8 @@ export const ES = {
   tagline:       'Cae. Sal más listo.',
   placeholder:   'prueba: agujeros negros, jazz, pulpos…',
   dive_btn:      'Explorar 🐰',
-  daily_label:   'Tema del día:',
+  daily_label:      'Tema del día:',
+  daily_goal_label: 'Meta: llegar a',
   starred_label: '♥ Favoritos',
   shared_trail:  '🔗 Recorrido compartido',
   continue_from: 'Continuar desde {topic} →',
@@ -444,6 +469,29 @@ export const ES = {
   daily_goal_continue: 'Seguir explorando →',
   daily_goal_nudge:    'Inicia sesión para guardar tus logros →',
   share_text_daily_win: '¡Llegué a {topic} en {n} saltos desde {start}! 🏆 Supéralo: followthehole.com',
+
+  // Leaderboard page
+  board_title:          'Clasificación',
+  board_sub:            '¿Quién ha llegado más lejos?',
+  board_tab_dives:      '🕳️ Total de buceos',
+  board_tab_wins:       '🏆 Victorias diarias',
+  board_you:            '(tú)',
+  board_signin_nudge:   'Inicia sesión para aparecer en la tabla y seguir tu posición.',
+  board_signin_btn:     'Iniciar sesión',
+  board_empty_title:    'Nadie todavía',
+  board_empty_sub:      '¡Sé el primero en aparecer!',
+  board_footer:         'Top 50 · ordenado por {label} · {unit}',
+  board_unit_dives:     'buceos',
+  board_unit_wins:      'victorias',
+
+  // Contact line
+  contact_line:         '¿Tienes alguna pregunta o idea?',
+
+  // Profile sign-in card
+  profile_signin_title: 'Guarda tu progreso',
+  profile_signin_sub:   'Inicia sesión para sincronizar tus estadísticas, trofeos y rachas en todos tus dispositivos.',
+  profile_signin_btn:   'Iniciar sesión',
+  profile_daily_wins:   'Desafíos diarios ganados',
 };
 
 export const FR = {
@@ -460,7 +508,8 @@ export const FR = {
   tagline:       'Tombez. Ressortez plus malin.',
   placeholder:   'essaie : trous noirs, jazz, pieuvres…',
   dive_btn:      'Plonger 🐰',
-  daily_label:   'Le trou du jour :',
+  daily_label:      'Le trou du jour :',
+  daily_goal_label: 'Objectif : atteindre',
   starred_label: '♥ Favoris',
   shared_trail:  '🔗 Parcours partagé',
   continue_from: 'Continuer depuis {topic} →',
@@ -668,4 +717,27 @@ export const FR = {
   daily_goal_continue: 'Continuer à plonger →',
   daily_goal_nudge:    'Connecte-toi pour suivre tes victoires →',
   share_text_daily_win: "J'ai atteint {topic} en {n} sauts depuis {start} ! 🏆 Fais mieux : followthehole.com",
+
+  // Leaderboard page
+  board_title:          'Classement',
+  board_sub:            'Qui est allé le plus loin ?',
+  board_tab_dives:      '🕳️ Total de plongées',
+  board_tab_wins:       '🏆 Victoires quotidiennes',
+  board_you:            '(toi)',
+  board_signin_nudge:   'Connecte-toi pour apparaître dans le classement et suivre ta position.',
+  board_signin_btn:     'Se connecter',
+  board_empty_title:    'Personne encore',
+  board_empty_sub:      'Sois le premier à apparaître !',
+  board_footer:         'Top 50 · classé par {label} · {unit}',
+  board_unit_dives:     'plongées',
+  board_unit_wins:      'victoires',
+
+  // Contact line
+  contact_line:         'Une question ou une idée ?',
+
+  // Profile sign-in card
+  profile_signin_title: 'Sauvegarde ta progression',
+  profile_signin_sub:   'Connecte-toi pour synchroniser tes stats, trophées et séries sur tous tes appareils.',
+  profile_signin_btn:   'Se connecter',
+  profile_daily_wins:   'Défis quotidiens remportés',
 };

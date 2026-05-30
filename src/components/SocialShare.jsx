@@ -232,7 +232,7 @@ export default function SocialShare({ chain, startTopic, compact = false, isDail
           <FbIcon />
         </button>
         <span
-          className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap font-body text-[10px] font-bold text-black/70 bg-[#F7C948] border border-black rounded-md px-2 py-0.5 pointer-events-none transition-opacity duration-300"
+          className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap font-body text-[10px] font-bold text-white bg-[#0D0721] border border-black rounded-md px-2 py-0.5 pointer-events-none transition-opacity duration-300"
           style={{ opacity: fbCopied ? 1 : 0 }}
         >
           Paste in your post!

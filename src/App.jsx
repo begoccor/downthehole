@@ -15,14 +15,14 @@ import Terms from './pages/Terms';
 export default function App() {
   return (
     <LanguageProvider>
-    <TrophyProvider>
     <AuthProvider>
+    <TrophyProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-page">
           <Nav />
           <TrophyToast />
           <AuthModal />
-          <div className="pb-16 md:pb-0">
+          <div className="pb-24 md:pb-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
@@ -39,8 +39,8 @@ export default function App() {
           </div>
         </div>
       </BrowserRouter>
-    </AuthProvider>
     </TrophyProvider>
+    </AuthProvider>
     </LanguageProvider>
   );
 }
