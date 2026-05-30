@@ -154,7 +154,7 @@ function IgIcon() {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function SocialShare({ chain, startTopic, compact = false, isDailySession = false, challengeOriginalDepth = null }) {
+export default function SocialShare({ chain, startTopic, compact = false, isDailySession = false, isDailyWin = false, challengeOriginalDepth = null }) {
   const [igState, setIgState]   = useState('idle'); // 'idle' | 'loading' | 'done' | 'copied'
   const [fbCopied, setFbCopied] = useState(false);
   const { t } = useLanguage();
@@ -163,7 +163,9 @@ export default function SocialShare({ chain, startTopic, compact = false, isDail
   const displayTrail = n > 5
     ? chain.slice(0, 3).join(' → ') + ' → … → ' + chain[n - 1]
     : chain.join(' → ');
-  const shareText = isDailySession
+  const shareText = isDailyWin
+    ? t('share_text_daily_win', { topic: chain[n - 1], n: n - 1, start: startTopic })
+    : isDailySession
     ? t('share_text_daily', { n, topic: startTopic })
     : challengeOriginalDepth != null
     ? t('share_text_challenge', { n })

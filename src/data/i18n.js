@@ -3,6 +3,7 @@ export const EN = {
   nav_home:  'Home',
   nav_how:   'How it works',
   nav_holes: '🐰 My holes',
+  nav_board: 'Board',
   nav_light: 'Switch to light mode',
   nav_dark:  'Switch to dark mode',
   nav_lang:  'FR',
@@ -210,6 +211,15 @@ export const EN = {
   daily_done_lbl:   '🌅 Daily Challenge',
   daily_done_title: 'Done! {n} hops deep',
   daily_done_sub:   'Share and see how your friends do',
+
+  // Daily goal celebration screen
+  daily_goal_heading:  'Challenge complete!',
+  daily_goal_sub:      'You reached {topic} in {n} hops from {start}',
+  daily_goal_path:     'Your path:',
+  daily_goal_share:    '🔗 Share your victory',
+  daily_goal_continue: 'Keep diving →',
+  daily_goal_nudge:    'Sign in to track your wins →',
+  share_text_daily_win: 'I reached {topic} in {n} hops from {start}! 🏆 Beat my daily challenge: followthehole.com',
 };
 
 export const ES = {
@@ -217,6 +227,7 @@ export const ES = {
   nav_home:  'Inicio',
   nav_how:   'Cómo funciona',
   nav_holes: '🐰 Mis madrigueras',
+  nav_board: 'Ranking',
   nav_light: 'Cambiar a modo claro',
   nav_dark:  'Cambiar a modo oscuro',
   nav_lang:  'ES',
@@ -424,6 +435,15 @@ export const ES = {
   daily_done_lbl:   '🌅 Desafío diario',
   daily_done_title: '¡Hecho! {n} saltos',
   daily_done_sub:   'Comparte y ve cómo les va a tus amigos',
+
+  // Daily goal celebration screen
+  daily_goal_heading:  '¡Desafío completado!',
+  daily_goal_sub:      'Llegaste a {topic} en {n} saltos desde {start}',
+  daily_goal_path:     'Tu recorrido:',
+  daily_goal_share:    '🔗 Comparte tu victoria',
+  daily_goal_continue: 'Seguir explorando →',
+  daily_goal_nudge:    'Inicia sesión para guardar tus logros →',
+  share_text_daily_win: '¡Llegué a {topic} en {n} saltos desde {start}! 🏆 Supéralo: followthehole.com',
 };
 
 export const FR = {
@@ -431,6 +451,7 @@ export const FR = {
   nav_home:  'Accueil',
   nav_how:   'Comment ça marche',
   nav_holes: '🐰 Mes terriers',
+  nav_board: 'Classement',
   nav_light: 'Passer en mode clair',
   nav_dark:  'Passer en mode sombre',
   nav_lang:  'EN',
@@ -638,4 +659,13 @@ export const FR = {
   daily_done_lbl:   '🌅 Défi du jour',
   daily_done_title: 'Fait ! {n} sauts',
   daily_done_sub:   'Partage et vois comment tes amis s\'en sortent',
+
+  // Daily goal celebration screen
+  daily_goal_heading:  'Défi accompli !',
+  daily_goal_sub:      'Tu as atteint {topic} en {n} sauts depuis {start}',
+  daily_goal_path:     'Ton parcours :',
+  daily_goal_share:    '🔗 Partage ta victoire',
+  daily_goal_continue: 'Continuer à plonger →',
+  daily_goal_nudge:    'Connecte-toi pour suivre tes victoires →',
+  share_text_daily_win: "J'ai atteint {topic} en {n} sauts depuis {start} ! 🏆 Fais mieux : followthehole.com",
 };

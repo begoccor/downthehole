@@ -8,9 +8,12 @@ import SocialShare from '../components/SocialShare';
 import { useDownvotes } from '../hooks/useDownvotes';
 import { useHistory } from '../hooks/useHistory';
 import { useStreak, getDepthBadge } from '../hooks/useStreak';
+import { useLeaderboard } from '../hooks/useLeaderboard';
 import { useTrophies } from '../contexts/TrophyContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getDailyTopic } from '../data/dailyTopics';
+import { DAILY_GOAL, hasWonToday, markWonToday } from '../data/dailyGoal';
+import { useAuth } from '../contexts/AuthContext';
 import OArrow from '../components/OArrow';
 import NewsletterSignup from '../components/NewsletterSignup';
 import PixelEarth from '../components/PixelEarth';
@@ -187,6 +190,154 @@ function DimensionPhase({ onContinue }) {
       >
         {t('continue_btn')}
       </motion.button>
+    </motion.div>
+  );
+}
+
+// ─── Daily goal win celebration ───────────────────────────────────────────────
+const WIN_PARTICLES = Array.from({ length: 22 }, (_, i) => ({
+  left:     `${(i * 47 + 11) % 100}%`,
+  top:      `${(i * 61 + 5) % 100}%`,
+  duration: 1.8 + (i % 4) * 0.6,
+  delay:    (i * 0.21) % 2.8,
+  emoji:    ['✦', '⭐', '✨', '🌟'][i % 4],
+  size:     `${0.7 + (i % 3) * 0.45}rem`,
+}));
+
+function DailyChallengeWonPhase({ topic, chain, onContinue }) {
+  const { t }  = useLanguage();
+  const { user, openAuthModal } = useAuth();
+  const n = chain.length - 1;
+  const startTopic = chain[0];
+
+  const displayTrail = chain.length > 5
+    ? [chain[0], chain[1], '···', chain[chain.length - 2], chain[chain.length - 1]]
+    : chain;
+
+  return (
+    <motion.div
+      key="daily_win"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.3 } }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden px-6 py-10"
+      style={{ background: 'linear-gradient(160deg, #0D0721 0%, #0A1800 45%, #0D0721 100%)' }}
+    >
+      {/* Gold particles */}
+      {WIN_PARTICLES.map((p, i) => (
+        <motion.span
+          key={i}
+          className="absolute select-none pointer-events-none"
+          style={{ left: p.left, top: p.top, fontSize: p.size, color: '#F7C948' }}
+          animate={{ opacity: [0, 1, 0], scale: [0.4, 1.4, 0.4], rotate: [0, 180, 360] }}
+          transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
+        >
+          {p.emoji}
+        </motion.span>
+      ))}
+
+      <div className="z-10 w-full max-w-md mx-auto flex flex-col items-center gap-5">
+        {/* Trophy */}
+        <motion.div
+          initial={{ scale: 0, rotate: -25 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', bounce: 0.65, delay: 0.05 }}
+          className="text-[5.5rem] leading-none"
+        >
+          🏆
+        </motion.div>
+
+        {/* Heading + sub */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+          className="text-center"
+        >
+          <h1 className="font-display text-[clamp(2rem,8vw,3.5rem)] text-[#F7C948] leading-tight mb-2">
+            {t('daily_goal_heading')}
+          </h1>
+          <p className="font-body text-sm text-white/60">
+            {t('daily_goal_sub', { topic, n, start: startTopic })}
+          </p>
+        </motion.div>
+
+        {/* Hop count badge */}
+        <motion.div
+          initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.35, type: 'spring', bounce: 0.45 }}
+          className="inline-flex items-center gap-2 px-5 py-2 bg-[#F7C948] border-4 border-black rounded-full shadow-[4px_4px_0_#111]"
+        >
+          <span className="font-display text-3xl text-black">{n}</span>
+          <span className="font-body text-sm font-bold text-black/70">{n === 1 ? 'hop' : 'hops'}</span>
+        </motion.div>
+
+        {/* Trail card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+          className="w-full rounded-2xl border-2 p-4"
+          style={{ background: 'rgba(247,201,72,0.06)', borderColor: 'rgba(247,201,72,0.25)' }}
+        >
+          <p className="font-body text-[10px] uppercase tracking-widest mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {t('daily_goal_path')}
+          </p>
+          <div className="flex flex-wrap gap-2 items-center justify-center">
+            {displayTrail.map((step, i) => {
+              const isEllipsis = step === '···';
+              const isLast     = i === displayTrail.length - 1;
+              return (
+                <span key={i} className="flex items-center gap-1.5">
+                  {isEllipsis ? (
+                    <span className="font-body text-sm px-1" style={{ color: 'rgba(255,255,255,0.3)' }}>···</span>
+                  ) : (
+                    <span className={`font-body text-xs font-semibold border-2 rounded-full px-3 py-1 ${
+                      isLast
+                        ? 'bg-[#F7C948] border-[#F7C948] text-black'
+                        : 'border-white/20 text-white/75'
+                    }`} style={isLast ? {} : { background: 'rgba(255,255,255,0.07)' }}>
+                      {step.length > 20 ? step.slice(0, 19) + '…' : step}
+                    </span>
+                  )}
+                  {i < displayTrail.length - 1 && !isEllipsis && displayTrail[i + 1] !== '···' && (
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>→</span>
+                  )}
+                  {displayTrail[i + 1] === '···' && (
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>→</span>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Sign-in nudge */}
+        {!user && (
+          <motion.button
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+            onClick={openAuthModal}
+            className="font-body text-sm underline"
+            style={{ color: 'rgba(247,201,72,0.65)' }}
+          >
+            {t('daily_goal_nudge')}
+          </motion.button>
+        )}
+
+        {/* Share + continue */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          className="w-full flex flex-col items-center gap-4"
+        >
+          <p className="font-body text-xs uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {t('daily_goal_share')}
+          </p>
+          <SocialShare chain={chain} startTopic={startTopic} isDailyWin={true} />
+          <button
+            onClick={onContinue}
+            className="font-body text-sm transition-colors"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+          >
+            {t('daily_goal_continue')}
+          </button>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -491,7 +642,8 @@ function LoadingPhase() {
       className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] gap-5"
     >
       <div className="relative">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}>
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
+          style={{ borderRadius: '50%', overflow: 'hidden', width: 80, height: 80 }}>
           <PixelEarth size={80} animate={false} />
         </motion.div>
         <motion.div
@@ -499,7 +651,7 @@ function LoadingPhase() {
           animate={{ y: [0, -5, 0], rotate: [0, 8, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <PixelWorm width={36} />
+          <PixelRabbit width={36} />
         </motion.div>
       </div>
       <p className="font-display text-2xl text-fg">{t('loading')}</p>
@@ -1169,8 +1321,9 @@ export default function Home() {
   const [challengeOriginalDepth, setChallengeOriginalDepth] = useState(null);
 
   const { startSession, addToChain, isLiked, toggleLike, likedTopics } = useHistory();
-  const { recordDive, recordDepth }                                      = useStreak();
-  const { awardTrophy }                                                  = useTrophies();
+  const { streak, recordDive, recordDepth }                             = useStreak();
+  const { awardTrophy }                                                 = useTrophies();
+  const { syncStats, recordDailyWin }                                   = useLeaderboard();
   const { lang, t }                                                      = useLanguage();
   const { downvote, isDownvoted }                                        = useDownvotes();
 
@@ -1178,6 +1331,7 @@ export default function Home() {
   const seenRef       = useRef(new Set());
   const chainRef      = useRef([]);
   const dimensionRef  = useRef(false);
+  const dailyWonRef   = useRef(false);
   const factsTimerRef = useRef(null);
   const resetRef      = useRef(null);
   const searchIdRef   = useRef(0);
@@ -1281,6 +1435,15 @@ export default function Home() {
         awardTrophy('og_rabbit');
       }
 
+      // Daily goal win detection
+      if (continueSession && isDailySession && DAILY_GOAL.test(data.title) && !dailyWonRef.current && !hasWonToday()) {
+        dailyWonRef.current = true;
+        markWonToday();
+        recordDailyWin();
+        setPhase('daily_win');
+        return;
+      }
+
       const is50 = continueSession && depth === 50 && !dimensionRef.current;
       if (is50) {
         dimensionRef.current = true;
@@ -1316,6 +1479,7 @@ export default function Home() {
     seenRef.current      = new Set();
     chainRef.current     = [];
     dimensionRef.current = false;
+    dailyWonRef.current  = false;
     setPhase('input');
     setTopicData(null);
     setFacts([]);
@@ -1338,6 +1502,11 @@ export default function Home() {
     window.addEventListener('dth-go-home', h);
     return () => window.removeEventListener('dth-go-home', h);
   }, []);
+
+  // Sync stats to leaderboard after each session (no-op if not signed in)
+  useEffect(() => {
+    if (streak.total > 0) syncStats(streak.current, streak.total);
+  }, [streak.current, streak.total, syncStats]);
 
   const swipeRight = () => runSearch(related[relIdx].title, true);
   const swipeLeft  = () => {
@@ -1403,6 +1572,21 @@ export default function Home() {
         )}
         {phase === 'loading'    && <LoadingPhase key="loading" />}
         {phase === 'dimension'  && <DimensionPhase key="dimension" onContinue={handleDimensionContinue} />}
+        {phase === 'daily_win' && topicData && (
+          <DailyChallengeWonPhase
+            key="daily_win"
+            topic={topicData.title}
+            chain={chainRef.current}
+            onContinue={() => {
+              if (localStorage.getItem('dth-skip-transition') === 'true') {
+                setPhase('facts');
+              } else {
+                setPhase('transition');
+                advanceToFacts();
+              }
+            }}
+          />
+        )}
         {phase === 'transition' && <TransitionPhase key="transition" onSkip={() => {
           clearTimeout(factsTimerRef.current);
           setPhase('facts');
