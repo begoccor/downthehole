@@ -19,24 +19,43 @@ export function TrophyProvider({ children }) {
   const [pendingId, setPendingId] = useState(null);
   const [toast, setToast]         = useState(null);
 
-  // Merge DB trophies into local state when user signs in
+  // Bidirectional trophy sync on sign-in:
+  //  - pull DB trophies into local state
+  //  - push any local-only trophies back to DB
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('leaderboard')
-      .select('trophies')
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (!data?.trophies?.length) return;
-        const dbIds = data.trophies.map(t => t.id);
-        setEarned(prev => {
-          const merged = new Set([...prev, ...dbIds]);
-          localStorage.setItem(KEY, JSON.stringify([...merged]));
-          return merged;
-        });
-      })
-      .catch(() => {});
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('leaderboard')
+          .select('trophies')
+          .eq('user_id', user.id)
+          .single();
+
+        const dbTrophies = data?.trophies ?? [];
+        const dbIds = new Set(dbTrophies.map(t => t.id));
+        const local = loadLocal();
+
+        // Merge DB into local
+        const merged = new Set([...local, ...dbIds]);
+        localStorage.setItem(KEY, JSON.stringify([...merged]));
+        setEarned(merged);
+
+        // Push local-only trophies back to DB
+        const today = new Date().toISOString().slice(0, 10);
+        const localOnly = [...local].filter(id => !dbIds.has(id));
+        if (localOnly.length > 0) {
+          const updated = [
+            ...dbTrophies,
+            ...localOnly.map(id => ({ id, earned_at: today })),
+          ];
+          await supabase
+            .from('leaderboard')
+            .update({ trophies: updated, updated_at: new Date().toISOString() })
+            .eq('user_id', user.id);
+        }
+      } catch {}
+    })();
   }, [user?.id]);
 
   const awardTrophy = useCallback((id) => {

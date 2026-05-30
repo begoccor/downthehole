@@ -27,17 +27,23 @@ export function useLeaderboard() {
     } catch {}
   }, [user]);
 
-  // Sync full profile stats including longest streak and deepest dive
+  // Sync full profile stats — takes the max of local vs DB to avoid overwriting
+  // data from another device.
   const syncFullStats = useCallback(async (streak) => {
     if (!user) return;
     try {
+      const { data: current } = await supabase
+        .from('leaderboard')
+        .select('daily_streak, longest_streak, deepest_dive, total_dives')
+        .eq('user_id', user.id)
+        .single();
       await supabase
         .from('leaderboard')
         .update({
-          daily_streak:   streak.current,
-          longest_streak: streak.longest,
-          deepest_dive:   streak.deepest,
-          total_dives:    streak.total,
+          daily_streak:   Math.max(streak.current, current?.daily_streak   ?? 0),
+          longest_streak: Math.max(streak.longest, current?.longest_streak ?? 0),
+          deepest_dive:   Math.max(streak.deepest, current?.deepest_dive   ?? 0),
+          total_dives:    Math.max(streak.total,   current?.total_dives    ?? 0),
           updated_at:     new Date().toISOString(),
         })
         .eq('user_id', user.id);

@@ -56,11 +56,14 @@ export default function RabbitHoles() {
     if (likedTopics.size >= 5) awardTrophy('starred_5');
   }, [streak.total, streak.current, likedTopics.size, awardTrophy]);
 
-  // Fetch profile from DB and sync full stats when signed in
+  // Sync stats first (merges local + DB taking max), then fetch the result
   useEffect(() => {
     if (!user) return;
-    fetchProfile().then(data => { if (data) setDbProfile(data); });
-    syncFullStats(streak);
+    (async () => {
+      await syncFullStats(streak);
+      const data = await fetchProfile();
+      if (data) setDbProfile(data);
+    })();
   }, [user?.id]);
 
   const displayName = dbProfile?.display_name
