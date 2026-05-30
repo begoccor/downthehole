@@ -67,12 +67,14 @@ export default function AuthModal() {
     const localStreak = (() => {
       try { return JSON.parse(localStorage.getItem('dth-streak') ?? '{}'); } catch { return {}; }
     })();
-    await supabase.from('leaderboard').insert({
-      user_id:      data.user.id,
-      display_name: name,
-      daily_streak: localStreak.current ?? 0,
-      total_dives:  localStreak.total   ?? 0,
-    }).catch(() => {});
+    try {
+      await supabase.from('leaderboard').insert({
+        user_id:      data.user.id,
+        display_name: name,
+        daily_streak: localStreak.current ?? 0,
+        total_dives:  localStreak.total   ?? 0,
+      });
+    } catch {}
 
     setLoading(false);
     setSuccess(true);
