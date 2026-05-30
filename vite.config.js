@@ -7,6 +7,11 @@ export default defineConfig({
   build: {
     target: ['chrome87', 'firefox78', 'safari14', 'edge88'],
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'safari14',
+    },
+  },
   test: {
     environment: 'node',
   },
