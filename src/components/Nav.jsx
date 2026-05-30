@@ -23,11 +23,6 @@ export default function Nav() {
   const { lang, setLang, t } = useLanguage();
   const { user, signOut, openAuthModal } = useAuth();
 
-  const cycleLang = () => {
-    const next = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
-    setLang(next);
-  };
-
   const navLinks = [
     { to: '/rabbit-holes', label: t('nav_holes') },
     { to: '/leaderboard',  label: '🏆 ' + t('nav_board') },
@@ -114,14 +109,17 @@ export default function Nav() {
 
             <Divider />
 
-            {/* Language cycle — single button, no dropdown */}
-            <button
-              onClick={cycleLang}
-              aria-label={`Language: ${lang.toUpperCase()}. Click to switch.`}
-              className="font-body font-bold text-[11px] tracking-widest w-9 h-9 rounded-xl border-2 border-[var(--nav-inactive-border)] nav-inactive flex items-center justify-center btn-press"
+            {/* Language picklist */}
+            <select
+              value={lang}
+              onChange={e => setLang(e.target.value)}
+              aria-label="Language"
+              className="font-body font-bold text-[11px] tracking-widest h-9 px-2 rounded-xl border-2 border-[var(--nav-inactive-border)] nav-inactive appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--yellow)]"
             >
-              {lang.toUpperCase()}
-            </button>
+              {LANGS.map(l => (
+                <option key={l} value={l}>{l.toUpperCase()}</option>
+              ))}
+            </select>
 
             {/* Theme toggle */}
             <button
