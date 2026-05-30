@@ -8,8 +8,12 @@ function isDisambig(data) {
   );
 }
 
+const WIKI_HEADERS = {
+  'Api-User-Agent': 'followthehole.com/1.0 (contact@followthehole.com)',
+};
+
 async function safeFetch(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: WIKI_HEADERS });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

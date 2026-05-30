@@ -168,8 +168,12 @@ export default function Nav() {
 
       {/* ── Mobile bottom tab bar ────────────────────────────────────── */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 nav-bar border-t"
-        style={{ borderColor: 'var(--nav-border)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 nav-bar flex items-stretch border-t"
+        style={{
+          borderColor: 'var(--nav-border)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          height: 'calc(56px + env(safe-area-inset-bottom))',
+        }}
       >
         {TABS.map(({ to, icon, key }) => {
           const active = pathname === to;
@@ -178,12 +182,21 @@ export default function Nav() {
               key={to}
               to={to}
               onClick={to === '/' ? () => window.dispatchEvent(new CustomEvent('dth-go-home')) : undefined}
-              className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
-                active ? 'text-[#E8432D]' : 'text-fg-muted'
-              }`}
+              className="flex-1 flex flex-col items-center justify-center gap-1 transition-all relative"
             >
-              <span className="text-xl leading-none">{icon}</span>
-              <span className="font-body text-[10px] font-semibold leading-none">
+              {active && (
+                <span
+                  className="absolute inset-x-2 top-1.5 bottom-1.5 rounded-xl"
+                  style={{ background: 'var(--yellow)', opacity: 0.15 }}
+                />
+              )}
+              <span className={`text-lg leading-none transition-transform ${active ? 'scale-110' : ''}`}>
+                {icon}
+              </span>
+              <span
+                className="font-body text-[10px] font-bold leading-none tracking-wide"
+                style={{ color: active ? 'var(--yellow)' : 'var(--fg-muted)' }}
+              >
                 {t(key).replace(/^🐰\s*/, '')}
               </span>
             </Link>
