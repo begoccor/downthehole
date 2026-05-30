@@ -4,6 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    target: ['chrome87', 'firefox78', 'safari14', 'edge88'],
+  },
   test: {
     environment: 'node',
   },
