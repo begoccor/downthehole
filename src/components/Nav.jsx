@@ -5,10 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 import OArrow from './OArrow';
 
 const TABS = [
-  { to: '/',             icon: '🕳️', key: 'nav_home'  },
-  { to: '/how-it-works', icon: '💡', key: 'nav_how'   },
-  { to: '/rabbit-holes', icon: '🐰', key: 'nav_holes' },
-  { to: '/leaderboard',  icon: '🏆', key: 'nav_board' },
+  { to: '/',             icon: '🕳️', key: 'nav_home',  label: null },
+  { to: '/how-it-works', icon: '💡', key: 'nav_how',   label: 'How-to' },
+  { to: '/rabbit-holes', icon: '🐰', key: 'nav_holes', label: null },
+  { to: '/leaderboard',  icon: '🏆', key: 'nav_board', label: null },
 ];
 
 const LANGS = ['en', 'fr', 'es'];
@@ -168,40 +168,35 @@ export default function Nav() {
 
       {/* ── Mobile bottom tab bar ────────────────────────────────────── */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 nav-bar flex items-stretch border-t"
-        style={{
-          borderColor: 'var(--nav-border)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          height: 'calc(56px + env(safe-area-inset-bottom))',
-        }}
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 nav-bar border-t"
+        style={{ borderColor: 'var(--nav-border)' }}
       >
-        {TABS.map(({ to, icon, key }) => {
-          const active = pathname === to;
-          return (
-            <Link
-              key={to}
-              to={to}
-              onClick={to === '/' ? () => window.dispatchEvent(new CustomEvent('dth-go-home')) : undefined}
-              className="flex-1 flex flex-col items-center justify-center gap-1 transition-all relative"
-            >
-              {active && (
-                <span
-                  className="absolute inset-x-2 top-1.5 bottom-1.5 rounded-xl"
-                  style={{ background: 'var(--yellow)', opacity: 0.15 }}
-                />
-              )}
-              <span className={`text-lg leading-none transition-transform ${active ? 'scale-110' : ''}`}>
-                {icon}
-              </span>
-              <span
-                className="font-body text-[10px] font-bold leading-none tracking-wide"
-                style={{ color: active ? 'var(--yellow)' : 'var(--fg-muted)' }}
+        <div
+          style={{ display: 'flex', flexDirection: 'row', height: 56, paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          {TABS.map(({ to, icon, key, label }) => {
+            const active = pathname === to;
+            const displayLabel = label ?? t(key).replace(/^🐰\s*/, '');
+            return (
+              <Link
+                key={to}
+                to={to}
+                onClick={to === '/' ? () => window.dispatchEvent(new CustomEvent('dth-go-home')) : undefined}
+                style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, position: 'relative', textDecoration: 'none' }}
               >
-                {t(key).replace(/^🐰\s*/, '')}
-              </span>
-            </Link>
-          );
-        })}
+                {active && (
+                  <span style={{ position: 'absolute', inset: '4px 6px', borderRadius: 10, background: 'var(--yellow)', opacity: 0.15 }} />
+                )}
+                <span style={{ fontSize: 20, lineHeight: 1, transform: active ? 'scale(1.15)' : 'scale(1)', transition: 'transform 0.15s' }}>
+                  {icon}
+                </span>
+                <span style={{ fontFamily: 'Nunito, sans-serif', fontSize: 10, fontWeight: 700, lineHeight: 1, color: active ? 'var(--yellow)' : 'var(--fg-muted)', letterSpacing: '0.03em' }}>
+                  {displayLabel}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </nav>
     </>
   );
