@@ -29,7 +29,8 @@ export default function RabbitHoles() {
   const [skipAnim, setSkipAnim] = useState(
     () => localStorage.getItem('dth-skip-transition') === 'true'
   );
-  const [dbProfile, setDbProfile] = useState(null);
+  const [dbProfile, setDbProfile]         = useState(null);
+  const [profileLoading, setProfileLoading] = useState(!!user);
 
   const toggleSkipAnim = () => {
     const next = !skipAnim;
@@ -59,17 +60,20 @@ export default function RabbitHoles() {
   // Sync stats first (merges local + DB taking max), then fetch the result
   useEffect(() => {
     if (!user) return;
+    setProfileLoading(true);
     (async () => {
       await syncFullStats(streak);
       const data = await fetchProfile();
       if (data) setDbProfile(data);
+      setProfileLoading(false);
     })();
   }, [user?.id]);
 
-  const displayName = dbProfile?.display_name
-    ?? user?.user_metadata?.display_name
-    ?? user?.email?.split('@')[0]
-    ?? null;
+  // Only show the name once the DB fetch has resolved — avoids flashing the
+  // stale auth-metadata name before the updated DB value arrives.
+  const displayName = profileLoading
+    ? null
+    : (dbProfile?.display_name ?? user?.email?.split('@')[0] ?? null);
 
   const divesLabel = history.length === 1
     ? t('dives_one')
