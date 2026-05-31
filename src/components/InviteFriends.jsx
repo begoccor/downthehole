@@ -26,7 +26,7 @@ export default function InviteFriends({ chain, dark = false }) {
   };
 
   const nativeShare = async () => {
-    try { await navigator.share({ title: 'Follow The Hole', text: msg, url: APP_URL }); }
+    try { await navigator.share({ title: 'Follow The Hole', text: msg }); }
     catch { /* cancelled or unsupported */ }
   };
 
