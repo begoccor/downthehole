@@ -17,111 +17,131 @@ async function generateShareImage(chain) {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // Yellow background
-  ctx.fillStyle = '#F7C948';
+  // Dark background
+  ctx.fillStyle = '#0D0721';
   ctx.fillRect(0, 0, W, H);
 
-  // Card hard shadow
-  const PAD = 56;
+  // Red header band
+  const HDR = 204;
+  ctx.fillStyle = '#E8432D';
+  ctx.fillRect(0, 0, W, HDR);
   ctx.fillStyle = '#111';
-  ctx.fillRect(PAD + 10, PAD + 10, W - PAD * 2, H - PAD * 2);
+  ctx.fillRect(0, HDR, W, 8);
 
-  // White card
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(PAD, PAD, W - PAD * 2, H - PAD * 2);
-  ctx.strokeStyle = '#111';
-  ctx.lineWidth = 8;
-  ctx.strokeRect(PAD, PAD, W - PAD * 2, H - PAD * 2);
-
-  // Yellow header bar
-  const HDR = 148;
-  ctx.fillStyle = '#F7C948';
-  ctx.fillRect(PAD, PAD, W - PAD * 2, HDR);
-  ctx.beginPath();
-  ctx.moveTo(PAD, PAD + HDR);
-  ctx.lineTo(W - PAD, PAD + HDR);
-  ctx.stroke();
-
-  // Title
-  ctx.fillStyle = '#0D0721';
-  ctx.font = '72px "Lilita One"';
-  ctx.textAlign = 'center';
+  // Rabbit emoji
+  ctx.font = '96px serif';
   ctx.textBaseline = 'middle';
-  ctx.fillText('FOLLOW THE HOLE', W / 2, PAD + HDR / 2);
+  ctx.textAlign = 'left';
+  ctx.fillText('🐰', 56, HDR / 2 + 4);
 
-  // Subtitle
-  ctx.fillStyle = '#555';
+  // Brand name
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '68px "Lilita One"';
+  ctx.textAlign = 'left';
+  ctx.fillText('FOLLOW THE HOLE', 196, HDR / 2 - 20);
+
+  // Tagline
+  ctx.fillStyle = 'rgba(255,255,255,0.72)';
+  ctx.font = '34px "Nunito"';
+  ctx.fillText('Fall in. Come out smarter.', 196, HDR / 2 + 34);
+
+  // Sub-header
+  ctx.fillStyle = 'rgba(255,255,255,0.46)';
   ctx.font = '38px "Nunito"';
-  ctx.fillText('went down the rabbit hole', W / 2, PAD + HDR + 58);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('went down the rabbit hole', W / 2, HDR + 76);
 
   // Trail — cap at 5 visible items
   const items = chain.length > 5
     ? [chain[0], chain[1], '···', chain[chain.length - 2], chain[chain.length - 1]]
     : chain;
 
-  const TRAIL_TOP  = PAD + HDR + 110;
-  const TRAIL_BOT  = H - PAD - 120;
+  const TRAIL_TOP  = HDR + 130;
+  const TRAIL_BOT  = 815;
   const ITEM_H     = (TRAIL_BOT - TRAIL_TOP) / items.length;
-  const PILL_H     = Math.min(ITEM_H * 0.62, 84);
-  const MAX_PILL_W = W - PAD * 2 - 80;
+  const PILL_H     = Math.min(ITEM_H * 0.60, 80);
+  const MAX_PILL_W = W - 160;
 
   items.forEach((topic, i) => {
-    const centerY = TRAIL_TOP + (i + 0.5) * ITEM_H;
+    const centerY    = TRAIL_TOP + (i + 0.5) * ITEM_H;
     const isEllipsis = topic === '···';
-    const isCurrent  = i === items.length - 1;
+    const isFirst    = i === 0;
+    const isLast     = i === items.length - 1;
 
-    // Downward arrow between items
     if (i > 0) {
-      ctx.fillStyle = '#E8432D';
-      ctx.font = '38px "Lilita One"';
-      ctx.fillText('↓', W / 2, centerY - ITEM_H / 2 + 4);
+      ctx.fillStyle = 'rgba(247,201,72,0.55)';
+      ctx.font = '34px "Lilita One"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('↓', W / 2, centerY - ITEM_H / 2 + 8);
     }
 
     if (isEllipsis) {
-      ctx.fillStyle = '#bbb';
-      ctx.font = '48px "Nunito"';
-      ctx.fillText('···', W / 2, centerY + 6);
+      ctx.fillStyle = 'rgba(255,255,255,0.30)';
+      ctx.font = '44px "Nunito"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('···', W / 2, centerY);
       return;
     }
 
-    // Measure + truncate label
-    ctx.font = `56px "Lilita One"`;
+    ctx.font = '50px "Lilita One"';
     let label = topic;
-    while (label.length > 1 && ctx.measureText(label + '…').width > MAX_PILL_W - 60)
+    while (label.length > 1 && ctx.measureText(label + '…').width > MAX_PILL_W - 80)
       label = label.slice(0, -1);
     if (label !== topic) label = label.slice(0, -1) + '…';
 
-    const textW  = ctx.measureText(label).width;
-    const pillW  = Math.min(textW + 72, MAX_PILL_W);
-    const pillX  = W / 2 - pillW / 2;
-    const pillY  = centerY - PILL_H / 2 + (i > 0 ? 8 : 0);
+    const textW = ctx.measureText(label).width;
+    const pillW = Math.min(textW + 80, MAX_PILL_W);
+    const pillX = W / 2 - pillW / 2;
+    const pillY = centerY - PILL_H / 2;
 
     // Shadow
-    ctx.fillStyle = '#111';
-    ctx.fillRect(pillX + 5, pillY + 5, pillW, PILL_H);
+    ctx.fillStyle = 'rgba(0,0,0,0.40)';
+    ctx.fillRect(pillX + 6, pillY + 6, pillW, PILL_H);
+
     // Fill
-    ctx.fillStyle = isCurrent ? '#E8432D' : '#fff';
+    ctx.fillStyle = isFirst ? '#F7C948' : isLast ? '#E8432D' : 'rgba(255,255,255,0.10)';
     ctx.fillRect(pillX, pillY, pillW, PILL_H);
-    ctx.strokeStyle = '#111';
-    ctx.lineWidth = 5;
+
+    // Border
+    ctx.strokeStyle = isFirst ? '#F7C948' : isLast ? '#E8432D' : 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 4;
     ctx.strokeRect(pillX, pillY, pillW, PILL_H);
+
     // Label
-    ctx.fillStyle = isCurrent ? '#fff' : '#0D0721';
-    ctx.fillText(label, W / 2, pillY + PILL_H / 2 + (i > 0 ? 8 : 0) + 3);
+    ctx.fillStyle = isFirst ? '#111111' : isLast ? '#ffffff' : 'rgba(255,255,255,0.75)';
+    ctx.font = '50px "Lilita One"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, W / 2, pillY + PILL_H / 2 + 4);
   });
 
-  // Depth
-  ctx.fillStyle = '#111';
-  ctx.font = '700 40px "Nunito"';
-  ctx.fillText(
-    `${chain.length} hop${chain.length !== 1 ? 's' : ''} deep`,
-    W / 2, H - PAD - 66
-  );
+  // CTA strip
+  const CTA_Y = 830;
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fillRect(0, CTA_Y, W, H - CTA_Y);
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  ctx.fillRect(0, CTA_Y, W, 3);
+
+  // Hop count
+  const n = chain.length;
+  ctx.fillStyle = '#F7C948';
+  ctx.font = '700 44px "Nunito"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(`${n} hop${n !== 1 ? 's' : ''} deep`, W / 2, CTA_Y + 56);
+
+  // CTA text
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '58px "Lilita One"';
+  ctx.fillText('Can you beat me? 🔥', W / 2, CTA_Y + 126);
 
   // URL
-  ctx.fillStyle = '#aaa';
-  ctx.font = '32px "Nunito"';
-  ctx.fillText('followthehole.com', W / 2, H - PAD - 22);
+  ctx.fillStyle = '#E8432D';
+  ctx.font = '700 38px "Nunito"';
+  ctx.fillText('followthehole.com', W / 2, CTA_Y + 178);
 
   return new Promise(resolve =>
     canvas.toBlob(blob => resolve(new File([blob], 'hole.png', { type: 'image/png' })), 'image/png')

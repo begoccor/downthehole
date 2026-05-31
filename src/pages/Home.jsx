@@ -16,6 +16,7 @@ import { DAILY_GOAL, hasWonToday, markWonToday } from '../data/dailyGoal';
 import { useAuth } from '../contexts/AuthContext';
 import OArrow from '../components/OArrow';
 import NewsletterSignup from '../components/NewsletterSignup';
+import InviteFriends from '../components/InviteFriends';
 import PixelEarth from '../components/PixelEarth';
 import PixelRabbit from '../components/PixelRabbit';
 import PixelWorm from '../components/PixelWorm';
@@ -329,6 +330,7 @@ function DailyChallengeWonPhase({ topic, chain, onContinue }) {
             {t('daily_goal_share')}
           </p>
           <SocialShare chain={chain} startTopic={startTopic} isDailyWin={true} />
+          <InviteFriends chain={chain} dark />
           <button
             onClick={onContinue}
             className="font-body text-sm transition-colors"
@@ -1298,6 +1300,7 @@ function DonePhase({ topic, chain, badge, onNewSearch, isDailySession, challenge
         <SocialShare chain={chain} startTopic={topic}
           isDailySession={isDailySession}
           challengeOriginalDepth={challengeOriginalDepth} />
+        <InviteFriends chain={chain} />
       </div>
 
       <NewsletterSignup className="w-full max-w-sm mt-6" />

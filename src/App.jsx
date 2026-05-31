@@ -31,7 +31,7 @@ export default function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
             </Routes>
-            <footer className="hidden md:flex justify-center gap-4 py-6">
+            <footer className="flex justify-center gap-4 py-6">
               <a href="/privacy" className="font-body text-xs text-fg-muted hover:text-fg transition-colors">Privacy Policy</a>
               <span className="font-body text-xs text-fg-muted">·</span>
               <a href="/terms" className="font-body text-xs text-fg-muted hover:text-fg transition-colors">Terms of Service</a>

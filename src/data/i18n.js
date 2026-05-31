@@ -244,6 +244,14 @@ export const EN = {
   profile_signin_sub:   'Sign in to sync your stats, trophies and streaks across devices and appear on the leaderboard.',
   profile_signin_btn:   'Sign in',
   profile_daily_wins:   'Daily challenges won',
+
+  // Invite friends
+  invite_title:         'Challenge a friend 🐰',
+  invite_placeholder:   'friend@email.com',
+  invite_send:          'Send',
+  invite_apps:          'Share via WhatsApp, Messages…',
+  invite_email_subject: 'You have to try this Wikipedia rabbit hole game',
+  invite_msg:           'I just went from {start} to {end} in {n} hops on Follow The Hole. Can you beat me? 👉 {url}',
 };
 
 export const ES = {
@@ -492,6 +500,14 @@ export const ES = {
   profile_signin_sub:   'Inicia sesión para sincronizar tus estadísticas, trofeos y rachas en todos tus dispositivos.',
   profile_signin_btn:   'Iniciar sesión',
   profile_daily_wins:   'Desafíos diarios ganados',
+
+  // Invite friends
+  invite_title:         'Reta a un amigo 🐰',
+  invite_placeholder:   'amigo@email.com',
+  invite_send:          'Enviar',
+  invite_apps:          'Compartir vía WhatsApp, Mensajes…',
+  invite_email_subject: 'Tienes que probar este juego de Wikipedia',
+  invite_msg:           'Acabo de ir de {start} a {end} en {n} saltos en Follow The Hole. ¿Puedes superarme? 👉 {url}',
 };
 
 export const FR = {
@@ -740,4 +756,12 @@ export const FR = {
   profile_signin_sub:   'Connecte-toi pour synchroniser tes stats, trophées et séries sur tous tes appareils.',
   profile_signin_btn:   'Se connecter',
   profile_daily_wins:   'Défis quotidiens remportés',
+
+  // Invite friends
+  invite_title:         'Défie un ami 🐰',
+  invite_placeholder:   'ami@email.com',
+  invite_send:          'Envoyer',
+  invite_apps:          'Partager via WhatsApp, Messages…',
+  invite_email_subject: 'Tu dois essayer ce jeu Wikipedia',
+  invite_msg:           "Je viens de passer de {start} à {end} en {n} sauts sur Follow The Hole. Tu peux faire mieux ? 👉 {url}",
 };

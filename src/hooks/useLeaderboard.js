@@ -7,23 +7,15 @@ export function useLeaderboard() {
 
   const syncStats = useCallback(async (dailyStreak, totalDives) => {
     if (!user) return;
-    const displayName =
-      user.user_metadata?.display_name ??
-      user.email?.split('@')[0] ??
-      'Anonymous';
     try {
       await supabase
         .from('leaderboard')
-        .upsert(
-          {
-            user_id:      user.id,
-            display_name: displayName,
-            daily_streak: dailyStreak,
-            total_dives:  totalDives,
-            updated_at:   new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        );
+        .update({
+          daily_streak: dailyStreak,
+          total_dives:  totalDives,
+          updated_at:   new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
     } catch {}
   }, [user]);
 
