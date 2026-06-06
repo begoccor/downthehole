@@ -8,11 +8,16 @@ export function useLeaderboard() {
   const syncStats = useCallback(async (dailyStreak, totalDives) => {
     if (!user) return;
     try {
+      const { data: current } = await supabase
+        .from('leaderboard')
+        .select('daily_streak, total_dives')
+        .eq('user_id', user.id)
+        .single();
       await supabase
         .from('leaderboard')
         .update({
-          daily_streak: dailyStreak,
-          total_dives:  totalDives,
+          daily_streak: Math.max(dailyStreak, current?.daily_streak ?? 0),
+          total_dives:  Math.max(totalDives,  current?.total_dives  ?? 0),
           updated_at:   new Date().toISOString(),
         })
         .eq('user_id', user.id);

@@ -11,10 +11,10 @@ export default function TrophyToast() {
     <AnimatePresence>
       {toast && (
         <motion.div
-          initial={{ opacity: 0, y: -70, scale: 0.9 }}
+          initial={{ opacity: 0, y: -24, scale: 0.93 }}
           animate={{ opacity: 1, y: 0,   scale: 1   }}
-          exit={{    opacity: 0, y: -70, scale: 0.9 }}
-          transition={{ type: 'spring', bounce: 0.4 }}
+          exit={{    opacity: 0, y: -10, scale: 0.96 }}
+          transition={{ type: 'spring', duration: 0.35, bounce: 0.2 }}
           className={`fixed top-20 left-1/2 -translate-x-1/2 z-[60]
             card border-4 ${RARITY_STYLES[toast.rarity].border}
             ${RARITY_STYLES[toast.rarity].glow}

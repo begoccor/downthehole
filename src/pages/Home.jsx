@@ -647,7 +647,7 @@ function LoadingPhase() {
       className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] gap-5"
     >
       <div className="relative">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.75, repeat: Infinity, ease: 'linear' }}
           style={{ borderRadius: '50%', overflow: 'hidden', width: 80, height: 80 }}>
           <PixelEarth size={80} animate={false} />
         </motion.div>
@@ -1164,7 +1164,7 @@ function SwipeCard({ topic, topicIndex, total, depth, chain, onBranch, onSwipeRi
       </div>
 
       <motion.div
-        drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.75}
+        drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.18}
         onDragEnd={handleDragEnd} style={{ x, rotate }} whileTap={{ cursor: 'grabbing' }}
         className="w-full max-w-sm card shadow-[8px_8px_0_#111] overflow-hidden cursor-grab touch-none select-none"
       >
