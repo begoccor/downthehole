@@ -20,6 +20,7 @@ class NoopChain {
 
 const noopClient = {
   from: () => new NoopChain(),
+  rpc: () => new NoopChain(),
   auth: {
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
     getSession:            async () => ({ data: { session: null } }),

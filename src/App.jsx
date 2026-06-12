@@ -4,6 +4,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Nav from './components/Nav';
 import TrophyToast from './components/TrophyToast';
+import RewardToast from './components/RewardToast';
 import AuthModal from './components/AuthModal';
 import Home from './pages/Home';
 import HowItWorks from './pages/HowItWorks';
@@ -21,6 +22,7 @@ export default function App() {
         <div className="min-h-screen bg-page">
           <Nav />
           <TrophyToast />
+          <RewardToast />
           <AuthModal />
           <div className="pb-24 md:pb-0" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}>
             <Routes>

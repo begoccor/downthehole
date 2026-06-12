@@ -8,8 +8,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLeaderboard } from '../hooks/useLeaderboard';
 import { useLanguage } from '../contexts/LanguageContext';
 import { TROPHIES, RARITY_STYLES } from '../data/trophies';
+import { getTotalDailyWins } from '../data/dailyPuzzle';
 import SocialShare from '../components/SocialShare';
 import NewsletterSignup from '../components/NewsletterSignup';
+import BurrowScene from '../components/burrow/BurrowScene';
+import ShareBurrow from '../components/burrow/ShareBurrow';
+import QuestPanel from '../components/burrow/QuestPanel';
+import CreatureAlbum from '../components/burrow/CreatureAlbum';
+import Wardrobe from '../components/burrow/Wardrobe';
 
 function fmt(iso) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -115,7 +121,7 @@ export default function RabbitHoles() {
             </div>
           )}
           <h1 className="font-display text-[clamp(2.2rem,8vw,4rem)] text-fg leading-none">
-            {t('your_holes')}
+            {t('burrow_title')}
           </h1>
           <p className="font-body text-base text-fg-muted mt-1">{divesLabel}</p>
         </div>
@@ -128,6 +134,22 @@ export default function RabbitHoles() {
           </button>
         )}
       </div>
+
+      {/* The burrow itself */}
+      <BurrowScene
+        trophiesEarned={earned.size}
+        trophiesTotal={TROPHIES.length}
+        streak={streak.current}
+        deepest={streak.deepest}
+      />
+
+      <ShareBurrow
+        deepest={dbProfile?.deepest_dive ?? streak.deepest}
+        streak={dbProfile?.daily_streak ?? streak.current}
+        trophies={earned.size}
+        trophiesTotal={TROPHIES.length}
+        dailyWins={dbProfile?.daily_wins ?? getTotalDailyWins()}
+      />
 
       {/* Not signed in — sign-in prompt */}
       {!user && (
@@ -170,6 +192,12 @@ export default function RabbitHoles() {
           </div>
         </div>
       )}
+
+      {/* Weekly quests */}
+      <div className="mb-8">
+        <h2 className="font-display text-2xl text-fg mb-4">{t('quests_title')}</h2>
+        <QuestPanel />
+      </div>
 
       {/* Trophies */}
       <div className="mb-8">
@@ -217,6 +245,18 @@ export default function RabbitHoles() {
             );
           })}
         </div>
+      </div>
+
+      {/* Creature album */}
+      <div className="mb-8">
+        <h2 className="font-display text-2xl text-fg mb-4">{t('creatures_title')}</h2>
+        <CreatureAlbum />
+      </div>
+
+      {/* Wardrobe */}
+      <div className="mb-8">
+        <h2 className="font-display text-2xl text-fg mb-4">{t('wardrobe_title')}</h2>
+        <Wardrobe />
       </div>
 
       {/* Starred topics */}
