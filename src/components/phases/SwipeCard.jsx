@@ -119,31 +119,8 @@ function DirtBurst({ color }) {
   );
 }
 
-// Simplified card rendered behind the active one (D4)
-function StackedCard({ topic, index }) {
-  return (
-    <motion.div
-      initial={false}
-      animate={{ scale: 1 - 0.06 * (index + 1), y: 14 * (index + 1), opacity: index === 0 ? 0.65 : 0.35 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="absolute inset-0 card shadow-[8px_8px_0_#111] overflow-hidden pointer-events-none"
-      aria-hidden
-    >
-      {topic?.thumbnail?.source && (
-        <img src={topic.thumbnail.source} alt=""
-          className="w-full h-44 object-cover border-b-4 border-black" />
-      )}
-      <div className="p-6">
-        <h3 className="font-display text-[1.8rem] text-[#E8432D] leading-tight mb-2">
-          {topic?.title?.toUpperCase()}
-        </h3>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function SwipeCard({
-  topic, topicIndex, total, depth, chain, upcoming = [], justDove = false,
+  topic, topicIndex, total, depth, chain, justDove = false,
   rareSpawns = [], dailyPuzzle,
   onBranch, onSwipeRight, onSwipeLeft, onNewSearch, onDownvote,
 }) {
@@ -197,7 +174,7 @@ export default function SwipeCard({
       key={`rel-${topicIndex}`}
       initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.15 } }}
-      className="relative flex flex-col items-center justify-center min-h-[calc(100dvh-60px-4rem)] md:min-h-[calc(100dvh-60px)] px-4 py-8"
+      className="relative flex flex-col items-center justify-center min-h-[calc(100dvh-60px-5rem)] md:min-h-[calc(100dvh-60px)] px-4 py-4 md:py-8"
     >
       {/* Pixel creatures — emerge progressively with depth */}
       <AnimatePresence>
@@ -308,7 +285,7 @@ export default function SwipeCard({
       <TrailStrip chain={chain} onBranch={onBranch} />
 
       <p className="font-display text-xl text-white mb-1">{t('related_card')}</p>
-      <p className="font-body text-sm text-white/65 mb-5 tracking-wide">
+      <p className="font-body text-sm text-white/65 mb-3 md:mb-5 tracking-wide">
         {t('swipe_hint', { n: topicIndex + 1, total })}
       </p>
 
@@ -321,12 +298,7 @@ export default function SwipeCard({
         </motion.span>
       </div>
 
-      {/* Card stack (D4): upcoming cards peek out behind the active one */}
       <div className="relative w-full max-w-sm">
-        {upcoming.slice(0, 2).map((up, i) => (
-          <StackedCard key={up.title} topic={up} index={i} />
-        ))}
-
         {justDove && <DirtBurst color={layerColor} />}
 
         <motion.div
@@ -339,9 +311,9 @@ export default function SwipeCard({
         >
           {topic?.thumbnail?.source && (
             <img src={topic.thumbnail.source} alt={topic.title}
-              className="w-full h-44 object-cover border-b-4 border-black" />
+              className="w-full h-32 sm:h-44 object-cover border-b-4 border-black" />
           )}
-          <div className="p-6">
+          <div className="p-5 md:p-6">
             <motion.h3
               style={{ backgroundColor: titleGlow }}
               className="font-display text-[1.8rem] text-[#E8432D] leading-tight mb-2 rounded-md px-1 -mx-1"
@@ -360,7 +332,7 @@ export default function SwipeCard({
         </motion.div>
       </div>
 
-      <div className="flex gap-3 mt-6 w-full max-w-sm z-10">
+      <div className="flex gap-3 mt-4 md:mt-6 w-full max-w-sm z-10">
         <button onClick={() => commit('left')}
           className="flex-1 py-3 font-display text-lg text-black card shadow-[4px_4px_0_#111] btn-press"
         >

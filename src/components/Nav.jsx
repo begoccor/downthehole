@@ -167,7 +167,7 @@ export default function Nav() {
       {/* ── Mobile bottom tab bar ────────────────────────────────────── */}
       <nav
         className="md:hidden fixed bottom-0 inset-x-0 z-40 nav-bar border-t"
-        style={{ borderColor: 'var(--nav-border)' }}
+        style={{ borderColor: 'var(--nav-border)', transform: 'translateZ(0)', willChange: 'transform' }}
       >
         <div
           style={{ display: 'flex', flexDirection: 'row', paddingTop: 6, paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)' }}

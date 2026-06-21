@@ -387,7 +387,6 @@ export default function Home() {
             topic={related[relIdx]} topicIndex={relIdx} total={related.length}
             depth={chain.length}
             chain={chain} onBranch={topic => runSearch(topic, false)}
-            upcoming={related.slice(relIdx + 1, relIdx + 3)}
             justDove={relIdx === 0 && chain.length > 1}
             rareSpawns={rareSpawns}
             dailyPuzzle={!dailyWon ? activeDaily : null}
