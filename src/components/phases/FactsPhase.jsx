@@ -137,6 +137,7 @@ export default function FactsPhase({ topicData, facts, cameo, onNext, onNewSearc
                       className="card shadow-[4px_4px_0_#111] overflow-hidden shrink-0 w-40 md:w-auto md:shrink"
                     >
                       <img src={img.url} alt={img.title}
+                        loading="lazy" decoding="async"
                         className="w-full object-cover block"
                         style={{ maxHeight: '170px', height: '120px' }} />
                     </motion.div>

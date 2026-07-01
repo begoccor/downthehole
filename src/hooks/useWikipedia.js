@@ -138,7 +138,10 @@ export async function fetchFullIntro(title, lang = 'en') {
 }
 
 export async function fetchArticleImages(title, lang = 'en') {
-  const url = `${MW(lang)}?action=query&generator=images&titles=${encodeURIComponent(title)}&prop=imageinfo&iiprop=url|size|mime&gimlimit=20&format=json&origin=*`;
+  // iiurlwidth makes the API return a scaled `thumburl` (~400px) alongside the
+  // full-res original. We display these at ~160px, so downloading the multi-MB
+  // originals was the cause of slow image loads — always prefer the thumbnail.
+  const url = `${MW(lang)}?action=query&generator=images&titles=${encodeURIComponent(title)}&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=400&gimlimit=20&format=json&origin=*`;
   try {
     const data = await safeFetch(url);
     const pages = data.query?.pages;
@@ -160,10 +163,10 @@ export async function fetchArticleImages(title, lang = 'en') {
         return true;
       })
       .map(p => ({
-        url: p.imageinfo[0].url,
+        url: p.imageinfo[0].thumburl || p.imageinfo[0].url,
         title: p.title.replace(/^File:/, '').replace(/_/g, ' ').replace(/\.\w+$/, ''),
-        width: p.imageinfo[0].width,
-        height: p.imageinfo[0].height,
+        width: p.imageinfo[0].thumbwidth || p.imageinfo[0].width,
+        height: p.imageinfo[0].thumbheight || p.imageinfo[0].height,
       }))
       .slice(0, 6);
   } catch {
